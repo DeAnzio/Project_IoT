@@ -1,0 +1,114 @@
+body{
+    font-family: Arial, sans-serif;
+    margin:0;
+    background:#f5f5f5;
+}
+
+.header{
+    background:#78a9ff;
+    padding:20px;
+    text-align:center;
+    font-size:24px;
+    color:white;
+    font-weight:bold;
+}
+
+.content{
+    display:flex;
+    padding:20px;
+    gap:25px;
+}
+
+.card-left, .card-right{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    width:50%;
+    box-shadow:0 3px 8px rgba(0,0,0,0.1);
+}
+
+.device-row{
+    display:flex;
+    align-items:center;
+    margin:20px 0;
+    gap:20px;
+}
+
+.device-icon{
+    font-size:50px;
+}
+
+.device-count{
+    font-size:28px;
+}
+
+.status span{
+    color:#2ecc71;
+    font-weight:bold;
+}
+
+.ideal-row{
+    display:flex;
+    justify-content:space-between;
+    margin-top:20px;
+}
+
+.ideal-box{
+    text-align:center;
+}
+
+.status-box{
+    display:flex;
+    padding:15px;
+    margin-top:15px;
+    border-radius:10px;
+    align-items:center;
+    gap:15px;
+    color:#333;
+}
+
+.status-box .icon{
+    font-size:30px;
+}
+
+/* warna status */
+.high{
+    background:linear-gradient(to right, #ffb3b3, #d1ffd1);
+}
+
+.ideal{
+    background:#c8f5d0;
+}
+
+.power-container{
+    display:flex;
+    justify-content:center;
+    margin:30px 0;
+}
+
+.power-btn{
+    width:200px;
+    height:200px;
+    border:none;
+    border-radius:50%;
+    font-size:28px;
+    background:linear-gradient(to right, #ff8a8a, #9dffc4);
+    cursor:pointer;
+    font-weight:bold;
+    box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+.menu-right{
+    margin-top:30px;
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.menu-item{
+    padding:12px;
+    text-align:center;
+    background:#eee;
+    border-radius:10px;
+    font-weight:bold;
+}
