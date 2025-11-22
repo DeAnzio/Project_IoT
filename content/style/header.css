@@ -1,0 +1,71 @@
+body{
+    font-family: Arial, sans-serif;
+    margin:0;
+    background:#f5f5f5;
+}
+
+.header{
+    background:#78a9ff;
+    padding:20px 10px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    font-size:24px;
+    color:white;
+    font-weight:bold;
+}
+
+.headerkiri{
+    display:flex;
+    gap:5px;
+    align-items:center;
+}
+
+.headertengah{
+    display:flex;
+    gap:5px;
+    align-items:center;
+}
+.headerkanan{
+    display:flex;
+    align-items:center;
+}
+
+.logo-container {
+    position: relative;
+    display: inline-block;
+}
+
+.logo-clickable {
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    min-width: 200px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    z-index: 1000;
+    border-radius: 4px;
+    margin-top: 5px;
+}
+
+.dropdown-menu a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s;
+}
+
+.dropdown-menu a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown-menu.show {
+    display: block;
+}

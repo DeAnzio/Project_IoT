@@ -28,8 +28,10 @@ if($suhu < 18 || $suhu > 35){
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Warehouse Dashboard</title>
+    <title>Monitoring Supply Makanan</title>
+      <link rel="stylesheet" href="content/style/header.css">
     <link rel="stylesheet" href="content/style/stylesm.css">
+    <link rel="stylesheet" href="content/style/header.css">
 </head>
 <body>
 
@@ -70,7 +72,12 @@ if($suhu < 18 || $suhu > 35){
                             <p >2 Device</p>
                         </div>
                         <div class="statusline">
-                            <p class="status">Status: <span class="active">Active</span></p>
+                            <div class="statusleft">
+                                <span class="status-text"> Status : <span id="statusText" class="status-active">Active</span> </span>
+                            </div>
+                            <div class="statusright">
+                                <button id="toggleBtn" class="toggle-switch" onclick="toggleStatus()"></button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -194,6 +201,129 @@ if($suhu < 18 || $suhu > 35){
                 status.textContent = 'OFF';
             }
         });
+
+                    let isActive = true;
+        let currentMode = 'auto';
+
+        // Toggle Status Function
+        function toggleStatus() {
+            isActive = !isActive;
+            const statusText = document.getElementById('statusText');
+            const toggleBtn = document.getElementById('toggleBtn');
+
+            if (isActive) {
+                statusText.textContent = 'Active';
+                statusText.className = 'status-active';
+                toggleBtn.classList.remove('inactive');
+            } else {
+                statusText.textContent = 'Inactive';
+                statusText.className = 'status-inactive';
+                toggleBtn.classList.add('inactive');
+            }
+
+            // Send status to server
+            updateStatusToServer(isActive);
+        }
+
+        // Set Mode Function
+        function setMode(mode) {
+            currentMode = mode;
+            const autoMode = document.getElementById('autoMode');
+            const scheduleMode = document.getElementById('scheduleMode');
+
+            if (mode === 'auto') {
+                autoMode.classList.add('active');
+                scheduleMode.classList.remove('active');
+            } else {
+                scheduleMode.classList.add('active');
+                autoMode.classList.remove('active');
+            }
+
+            // Send mode to server
+            updateModeToServer(mode);
+        }
+
+        // Update Status to Server
+        function updateStatusToServer(status) {
+            fetch('update_status.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    status: status ? 'active' : 'inactive',
+                    timestamp: new Date().toISOString()
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Status updated:', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Update Mode to Server
+        function updateModeToServer(mode) {
+            fetch('update_mode.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    mode: mode,
+                    timestamp: new Date().toISOString()
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Mode updated:', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Load Status from Server
+        function loadStatus() {
+            fetch('get_status.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status) {
+                        isActive = data.status === 'active';
+                        const statusText = document.getElementById('statusText');
+                        const toggleBtn = document.getElementById('toggleBtn');
+
+                        if (isActive) {
+                            statusText.textContent = 'Active';
+                            statusText.className = 'status-active';
+                            toggleBtn.classList.remove('inactive');
+                        } else {
+                            statusText.textContent = 'Inactive';
+                            statusText.className = 'status-inactive';
+                            toggleBtn.classList.add('inactive');
+                        }
+                    }
+
+                    if (data.mode) {
+                        setMode(data.mode);
+                    }
+
+                    if (data.device_count) {
+                        document.getElementById('deviceCount').textContent = data.device_count;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading status:', error);
+                });
+        }
+
+        // Auto refresh every 5 seconds
+        setInterval(loadStatus, 5000);
+
+        // Load initial status
+        loadStatus();
     </script>
 </body>
 </html>

@@ -72,26 +72,6 @@ body{
             font-weight: bold;
         }
 
-
-.statusline{
-    margin: 0;
-    margin-top: -50px;
-    display: flex
-}
-
-.statusleft{
-    width:300px;
-    
-}
-
-.statusright{
-    padding-left: 0px;
-    float:right;
-    width:30%;
-    display:flex;
-    justify-content:flex-end;
-}
-
 .card-left-bottom{
     margin-top: 12%;
     
@@ -105,7 +85,7 @@ body{
 
 .vl {
   border-right: 6px solid black;
-  height: 300px;
+  height: 500px;
 }
 
 .card-right{
@@ -118,8 +98,10 @@ body{
 .card-right-top{
     margin-bottom: 5%;
 }
+
 .card-right-bottom{
     margin-top: 5%;
+    border-top: #000000 2px solid;
     }
 
 .card-right-bottom-content{
@@ -130,11 +112,23 @@ body{
     padding-left: 15%;
 }
 
-.titlesuhulembab{
+.titlestakat{
     font-size: 36px;
     font-weight: bold;
 }
 
+.card-left-bottom-content{
+    display: flex;
+    gap: 40px;
+    align-items: center;
+}
+
+.left-bottom-left{
+    display: grid;
+}
+.left-bottom-right{
+    display: grid;
+}
 .device-row{
      display: flex;
     align-items: center;
@@ -172,6 +166,20 @@ body{
 .statusline{
     margin: 0;
     margin-top: -50px;
+    display: flex
+}
+
+.statusleft{
+    width:300px;
+    
+}
+
+.statusright{
+    padding-left: 0px;
+    float:right;
+    width:30%;
+    display:flex;
+    justify-content:flex-end;
 }
 
 .status{
@@ -197,13 +205,12 @@ body{
 
 .status-box{
     display:flex;
-    width: 90%;
-    height: 10%;
+    width: 250px;
+    height: 60px;
     padding:5px;
     margin-top:15px;
     border-radius:10px;
     align-items:center;
-    gap:15px;
     color:#333;
 }
 
