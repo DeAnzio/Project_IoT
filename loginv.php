@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/config/auth.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,7 +26,9 @@
             <div class="title">O - Warehouse</div>
         </div>
         <div class="headerkanan">
-            <img src="content/header-powerbutton.png" alt="Logo" style="width:65px;height:65px;">
+            <a href="config/logout.php" title="Logout">
+                <img src="content/header-powerbutton.png" alt="Logout" style="width:65px;height:65px;">
+            </a>
         </div>
     </header>
 

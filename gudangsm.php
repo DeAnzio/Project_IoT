@@ -1,5 +1,6 @@
 
 <?php
+require_once __DIR__ . '/config/auth.php';
 // contoh data dari backend (bisa diganti dari database / ESP32 API)
 $kelembapan = 75;
 $suhu       = 29;
@@ -52,7 +53,9 @@ if($suhu < 18 || $suhu > 35){
         <div class="title">O - Warehouse</div>
     </div>
     <div class="headerkanan">
-        <img src="content/header-powerbutton.png" alt="Logo" style="width:65px;height:65px;">
+        <a href="logout.php" title="Logout">
+            <img src="content/header-powerbutton.png" alt="Logout" style="width:65px;height:65px;">
+        </a>
     </div>
 </header>
 

@@ -1,3 +1,63 @@
+<?php
+session_start();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Simple login handler (connects to local iot_app database)
+    $username = isset($_POST['username']) ? trim($_POST['username']) : '';
+    $password = isset($_POST['password']) ? trim($_POST['password']) : '';
+
+    if ($username === '' || $password === '') {
+        header('Location: login.php?error=empty');
+        exit;
+    }
+
+    $dbHost = 'localhost';
+    $dbUser = 'root';
+    $dbPass = '';
+    $dbName = 'iot_app';
+
+    $conn = new mysqli($dbHost, $dbUser, $dbPass, $dbName);
+    if ($conn->connect_error) {
+        // You may want to show a friendly page instead of exposing DB errors
+        header('Location: login.php?error=invalid');
+        exit;
+    }
+
+    $stmt = $conn->prepare('SELECT id, username, password FROM account WHERE username = ? LIMIT 1');
+    $stmt->bind_param('s', $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($row = $result->fetch_assoc()) {
+        $stored = $row['password'];
+        $ok = false;
+        // Support both hashed and plain passwords (legacy). Prefer hashed in future.
+        if (password_verify($password, $stored)) {
+            $ok = true;
+        } elseif (hash_equals($stored, $password)) {
+            $ok = true;
+        }
+
+        if ($ok) {
+            // successful login
+            $_SESSION['user_id'] = $row['id'];
+            $_SESSION['username'] = $row['username'];
+            $stmt->close();
+            $conn->close();
+            header('Location: dashboard.php');
+            exit;
+        }
+    }
+
+    // invalid credentials
+    if (isset($stmt) && !empty($stmt)) $stmt->close();
+    if (isset($conn) && $conn) $conn->close();
+    header('Location: login.php?error=invalid');
+    exit;
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
