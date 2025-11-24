@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 23, 2025 at 08:09 AM
+-- Generation Time: Nov 24, 2025 at 07:20 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -32,6 +32,109 @@ CREATE TABLE `account` (
   `username` varchar(40) NOT NULL,
   `password` varchar(40) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `account`
+--
+
+INSERT INTO `account` (`id`, `username`, `password`) VALUES
+(1, 'admin', 'admin123');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `airsys`
+--
+
+CREATE TABLE `airsys` (
+  `id` bigint(20) NOT NULL,
+  `device_id` varchar(100) NOT NULL,
+  `sensor_type` varchar(50) DEFAULT NULL,
+  `value` float DEFAULT NULL,
+  `raw_value` text DEFAULT NULL,
+  `recorded_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `airsys`
+--
+
+INSERT INTO `airsys` (`id`, `device_id`, `sensor_type`, `value`, `raw_value`, `recorded_at`) VALUES
+(1, 'esp32-unit-001', 'DHT11_temp', 25.8, 'h=65.00', '2025-11-11 14:31:10'),
+(2, 'esp32-unit-001', 'DHT11_temp', 26.7, 'h=70.00', '2025-11-11 14:31:25'),
+(3, 'esp32-unit-001', 'DHT11_temp', 27.1, 'h=66.00', '2025-11-11 14:31:40'),
+(4, 'esp32-unit-001', 'DHT11_temp', 27.1, 'h=59.00', '2025-11-11 14:31:55'),
+(5, 'esp32-unit-001', 'DHT11_temp', 27.1, 'h=55.00', '2025-11-11 14:32:10'),
+(6, 'esp32-unit-001', 'DHT11_temp', 26.7, 'h=54.00', '2025-11-11 14:32:25'),
+(7, 'esp32-unit-001', 'DHT11_temp', 26.7, 'h=53.00', '2025-11-11 14:32:40'),
+(8, 'esp32-unit-001', 'DHT11_temp', 26.2, 'h=53.00', '2025-11-11 14:32:55'),
+(9, 'esp32-unit-001', 'DHT11_temp', 25.8, 'h=53.00', '2025-11-11 14:33:10'),
+(10, 'esp32-unit-001', 'DHT11_temp', 25.8, 'h=53.00', '2025-11-11 14:33:25'),
+(11, 'esp32-unit-001', 'DHT11_temp', 25.8, 'h=53.00', '2025-11-11 14:34:02'),
+(12, 'esp32-unit-001', 'DHT11_temp', 25.3, 'h=54.00', '2025-11-11 14:34:17'),
+(13, 'esp32-unit-001', 'DHT11_temp', 25.3, 'h=54.00', '2025-11-11 14:34:32'),
+(14, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:34:47'),
+(15, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:35:02'),
+(16, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:35:17'),
+(17, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:35:32'),
+(18, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:35:47'),
+(19, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:36:02'),
+(20, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:36:17'),
+(21, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:36:32'),
+(22, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:36:47'),
+(23, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:37:02'),
+(24, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:37:17'),
+(25, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:37:32'),
+(26, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:37:47'),
+(27, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:38:02'),
+(28, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:38:17'),
+(29, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:38:32'),
+(30, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:38:47'),
+(31, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:39:02'),
+(32, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:39:17'),
+(33, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:39:32'),
+(34, 'esp32-unit-001', 'DHT11_temp', 24.4, 'h=55.00', '2025-11-11 14:39:47'),
+(35, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:40:02'),
+(36, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:40:17'),
+(37, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:40:32'),
+(38, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:40:47'),
+(39, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:41:02'),
+(40, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:41:17'),
+(41, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:41:32'),
+(42, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:41:47'),
+(43, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:42:02'),
+(44, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:42:17'),
+(45, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:42:32'),
+(46, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:42:47'),
+(47, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:43:02'),
+(48, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:43:17'),
+(49, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:43:32'),
+(50, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:43:47'),
+(51, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:44:02'),
+(52, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:44:17'),
+(53, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:44:32'),
+(54, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:44:47'),
+(55, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:45:02'),
+(56, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:45:17'),
+(57, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:45:32'),
+(58, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:45:47'),
+(59, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:46:02'),
+(60, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:46:17'),
+(61, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:46:32'),
+(62, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:46:47'),
+(63, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:47:02'),
+(64, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:47:17'),
+(65, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:47:32'),
+(66, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:47:47'),
+(67, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:48:02'),
+(68, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:48:17'),
+(69, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:48:32'),
+(70, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:48:47'),
+(71, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:49:02'),
+(72, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:49:17'),
+(73, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:49:32'),
+(74, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:49:47'),
+(75, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:50:02');
 
 -- --------------------------------------------------------
 
@@ -127,10 +230,10 @@ INSERT INTO `devices` (`id`, `device_id`, `description`, `last_seen`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `sensor_data`
+-- Table structure for table `firesys`
 --
 
-CREATE TABLE `sensor_data` (
+CREATE TABLE `firesys` (
   `id` bigint(20) NOT NULL,
   `device_id` varchar(100) NOT NULL,
   `sensor_type` varchar(50) DEFAULT NULL,
@@ -139,86 +242,20 @@ CREATE TABLE `sensor_data` (
   `recorded_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `sensor_data`
+-- Table structure for table `secusys`
 --
 
-INSERT INTO `sensor_data` (`id`, `device_id`, `sensor_type`, `value`, `raw_value`, `recorded_at`) VALUES
-(1, 'esp32-unit-001', 'DHT11_temp', 25.8, 'h=65.00', '2025-11-11 14:31:10'),
-(2, 'esp32-unit-001', 'DHT11_temp', 26.7, 'h=70.00', '2025-11-11 14:31:25'),
-(3, 'esp32-unit-001', 'DHT11_temp', 27.1, 'h=66.00', '2025-11-11 14:31:40'),
-(4, 'esp32-unit-001', 'DHT11_temp', 27.1, 'h=59.00', '2025-11-11 14:31:55'),
-(5, 'esp32-unit-001', 'DHT11_temp', 27.1, 'h=55.00', '2025-11-11 14:32:10'),
-(6, 'esp32-unit-001', 'DHT11_temp', 26.7, 'h=54.00', '2025-11-11 14:32:25'),
-(7, 'esp32-unit-001', 'DHT11_temp', 26.7, 'h=53.00', '2025-11-11 14:32:40'),
-(8, 'esp32-unit-001', 'DHT11_temp', 26.2, 'h=53.00', '2025-11-11 14:32:55'),
-(9, 'esp32-unit-001', 'DHT11_temp', 25.8, 'h=53.00', '2025-11-11 14:33:10'),
-(10, 'esp32-unit-001', 'DHT11_temp', 25.8, 'h=53.00', '2025-11-11 14:33:25'),
-(11, 'esp32-unit-001', 'DHT11_temp', 25.8, 'h=53.00', '2025-11-11 14:34:02'),
-(12, 'esp32-unit-001', 'DHT11_temp', 25.3, 'h=54.00', '2025-11-11 14:34:17'),
-(13, 'esp32-unit-001', 'DHT11_temp', 25.3, 'h=54.00', '2025-11-11 14:34:32'),
-(14, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:34:47'),
-(15, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:35:02'),
-(16, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:35:17'),
-(17, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:35:32'),
-(18, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:35:47'),
-(19, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:36:02'),
-(20, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:36:17'),
-(21, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:36:32'),
-(22, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:36:47'),
-(23, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:37:02'),
-(24, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:37:17'),
-(25, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:37:32'),
-(26, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:37:47'),
-(27, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:38:02'),
-(28, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:38:17'),
-(29, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:38:32'),
-(30, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:38:47'),
-(31, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:39:02'),
-(32, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:39:17'),
-(33, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:39:32'),
-(34, 'esp32-unit-001', 'DHT11_temp', 24.4, 'h=55.00', '2025-11-11 14:39:47'),
-(35, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:40:02'),
-(36, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:40:17'),
-(37, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:40:32'),
-(38, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:40:47'),
-(39, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:41:02'),
-(40, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:41:17'),
-(41, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:41:32'),
-(42, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:41:47'),
-(43, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:42:02'),
-(44, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:42:17'),
-(45, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:42:32'),
-(46, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:42:47'),
-(47, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:43:02'),
-(48, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=55.00', '2025-11-11 14:43:17'),
-(49, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:43:32'),
-(50, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:43:47'),
-(51, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:44:02'),
-(52, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:44:17'),
-(53, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:44:32'),
-(54, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:44:47'),
-(55, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:45:02'),
-(56, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:45:17'),
-(57, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:45:32'),
-(58, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:45:47'),
-(59, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:46:02'),
-(60, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:46:17'),
-(61, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:46:32'),
-(62, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:46:47'),
-(63, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:47:02'),
-(64, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:47:17'),
-(65, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:47:32'),
-(66, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:47:47'),
-(67, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:48:02'),
-(68, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:48:17'),
-(69, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:48:32'),
-(70, 'esp32-unit-001', 'DHT11_temp', 24.5, 'h=54.00', '2025-11-11 14:48:47'),
-(71, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:49:02'),
-(72, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:49:17'),
-(73, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:49:32'),
-(74, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:49:47'),
-(75, 'esp32-unit-001', 'DHT11_temp', 24.8, 'h=54.00', '2025-11-11 14:50:02');
+CREATE TABLE `secusys` (
+  `id` bigint(20) NOT NULL,
+  `device_id` varchar(100) NOT NULL,
+  `sensor_type` varchar(50) DEFAULT NULL,
+  `value` float DEFAULT NULL,
+  `raw_value` text DEFAULT NULL,
+  `recorded_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables
@@ -229,6 +266,13 @@ INSERT INTO `sensor_data` (`id`, `device_id`, `sensor_type`, `value`, `raw_value
 --
 ALTER TABLE `account`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `airsys`
+--
+ALTER TABLE `airsys`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `device_id` (`device_id`);
 
 --
 -- Indexes for table `commands`
@@ -245,9 +289,16 @@ ALTER TABLE `devices`
   ADD UNIQUE KEY `device_id` (`device_id`);
 
 --
--- Indexes for table `sensor_data`
+-- Indexes for table `firesys`
 --
-ALTER TABLE `sensor_data`
+ALTER TABLE `firesys`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `device_id` (`device_id`);
+
+--
+-- Indexes for table `secusys`
+--
+ALTER TABLE `secusys`
   ADD PRIMARY KEY (`id`),
   ADD KEY `device_id` (`device_id`);
 
@@ -259,7 +310,13 @@ ALTER TABLE `sensor_data`
 -- AUTO_INCREMENT for table `account`
 --
 ALTER TABLE `account`
-  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `airsys`
+--
+ALTER TABLE `airsys`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT for table `commands`
@@ -274,9 +331,15 @@ ALTER TABLE `devices`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
--- AUTO_INCREMENT for table `sensor_data`
+-- AUTO_INCREMENT for table `firesys`
 --
-ALTER TABLE `sensor_data`
+ALTER TABLE `firesys`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
+
+--
+-- AUTO_INCREMENT for table `secusys`
+--
+ALTER TABLE `secusys`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
@@ -284,10 +347,10 @@ ALTER TABLE `sensor_data`
 --
 
 --
--- Constraints for table `sensor_data`
+-- Constraints for table `airsys`
 --
-ALTER TABLE `sensor_data`
-  ADD CONSTRAINT `sensor_data_ibfk_1` FOREIGN KEY (`device_id`) REFERENCES `devices` (`device_id`);
+ALTER TABLE `airsys`
+  ADD CONSTRAINT `airsys_ibfk_1` FOREIGN KEY (`device_id`) REFERENCES `devices` (`device_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

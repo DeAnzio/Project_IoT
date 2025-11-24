@@ -12,7 +12,7 @@ DHT dht(DHTPIN, DHTTYPE);
 // konfigurasi WiFi dan server
 const char* ssid = "YOUR_SSID";                       // Nama WiFi Kamu
 const char* password = "YOUR_WIFI_PASS";              // Password WiFI Kamu
-const char* server = "http://your-domain.or.ip/iot_app/api";  // IP PC kamu - PHP 
+const char* server = "http://your-domain.or.ip/iot_app/api_pdo";  // IP PC kamu - PHP (updated to api_pdo shim)
 // const char* server = "http://your-domain.or.ip:3000/api";  // IP PC kamu - Express
 const char* DEVICE_ID = "esp32-unit-001";             // (opsional) untuk ngasih tau Device aja
 
@@ -87,7 +87,7 @@ void sendSensorData(){
     HTTPClient http;
     
     // Buat URL tujuan
-    String url = String(server) + "/save_data.php";
+    String url = String(server) + "/save_data_airsys.php";
     http.begin(url);
     
     // Tambahkan header agar server tahu data yang dikirim berupa JSON

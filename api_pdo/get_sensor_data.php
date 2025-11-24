@@ -1,5 +1,8 @@
+
 <?php
-require '../config/koneksi.php';
+require '../config/koneksi_pdo.php';
+
+$pdo = $koneksi;
 
 // Cek apakah device_id ada
 $device_id = $_GET['device_id'] ?? null;

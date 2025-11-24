@@ -1,5 +1,8 @@
+
 <?php
-require '../config/koneksi.php';
+require '../config/koneksi_pdo.php';
+
+$pdo = $koneksi;
 
 // Tangkap data JSON
 $device_id = $_GET['device_id'] ?? null;

@@ -1,5 +1,8 @@
+
 <?php
-require '../config/koneksi.php';
+require '../config/koneksi_pdo.php';
+
+$pdo = $koneksi;
 
 // Baca input JSON
 $input = json_decode(file_get_contents('php://input'), true);
@@ -37,7 +40,7 @@ if ($stmt->rowCount() === 0) {
 }
 
 // Simpan data sensor
-$stmt = $pdo->prepare("INSERT INTO sensor_data (device_id, sensor_type, value, raw_value)
+$stmt = $pdo->prepare("INSERT INTO secusys (device_id, sensor_type, value, raw_value)
                        VALUES (:device_id, :stype, :value, :raw)");
 $stmt->execute([
     ':device_id' => $device_id,

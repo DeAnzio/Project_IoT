@@ -1,5 +1,8 @@
+
 <?php
-require '../config/koneksi.php';
+require '../config/koneksi_pdo.php';
+
+$pdo = $koneksi;
 
 // Baca input JSON
 $input = json_decode(file_get_contents('php://input'), true);
