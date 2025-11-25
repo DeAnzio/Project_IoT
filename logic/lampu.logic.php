@@ -3,8 +3,8 @@
 if (isset($_GET['lampu_on']) || isset($_GET['lampu_off'])) {
   $DEVICE_ID = "esp32-unit-001";
   $COMMAND   = isset($_GET['lampu_on']) ? "lampu_on" : "lampu_off";
-  $url       = "http://localhost/iot_app/api_pdo/set_command.php"; //PHP (updated to api_pdo shim)
-  // $url       = "http://localhost:3000/api/set_command"; //Express
+  $url       = "http://localhost/project_iot/api_pdo/set_command.php"; //PHP (updated to api_pdo shim)
+  // $url       = "http://localhost:3000/api_pdo/set_command"; //Express
 
   // Buat data JSON untuk dikirim ke API
   $data = [
@@ -34,6 +34,6 @@ if (isset($_GET['lampu_on']) || isset($_GET['lampu_off'])) {
   }
 
   // Balikin ke halaman awal
-  header('Location: ../index.php');
+  header('Location: ../gudangsm.php');
   exit;
 }

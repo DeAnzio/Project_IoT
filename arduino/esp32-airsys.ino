@@ -7,7 +7,7 @@
 #define DHTTYPE DHT11  // pin Type DHT11 - Tipe Sensor
 DHT dht(DHTPIN, DHTTYPE);
 
-#define LED_BUILTIN 2
+#define FANRELAY 2
 
 // konfigurasi WiFi dan server
 const char* ssid = "YOUR_SSID";                       // Nama WiFi Kamu
@@ -28,8 +28,8 @@ void setup(){
   // Setup Basic
   Serial.begin(115200);             // Jalanin Serial Monitor
   dht.begin();                      // Jalanin DHT Sensor
-  pinMode(LED_BUILTIN, OUTPUT);     // Lampu Builtin ESP32 jadi OUTPUT
-  digitalWrite(LED_BUILTIN, LOW);   // default mati
+  pinMode(FANRELAY, OUTPUT);     // Lampu Builtin ESP32 jadi OUTPUT
+  digitalWrite(FANRELAY, LOW);   // default mati
 
 	// Koneksi WiFI
 	WiFi.begin(ssid, password);                    // Koneksi ke Hospot kita
@@ -176,10 +176,10 @@ void executeCommand(long id, String cmd, String payload){
   
   // Percabangan untuk menjalankan IoT by command / status
   if (cmd == "lampu_on") {
-    digitalWrite(LED_BUILTIN, HIGH);
+    digitalWrite(FANRELAY, HIGH);
     result = "lampu_on_ok";
   } else if (cmd == "lampu_off") {
-    digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(FANRELAY, LOW);
     result = "lampu_off_ok";
   } else {
     result = "cmd_not_supported";

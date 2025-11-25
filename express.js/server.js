@@ -43,7 +43,7 @@ try {
 
 // --- 1. Konversi API: POST /api/save_data.php (Penerimaan Data Sensor) ---
 // Ini adalah rute paling penting untuk realtime
-app.post('/api/save_data', async (req, res) => {
+app.post('/api_pdo/save_data', async (req, res) => {
     const { device_id, sensor_type = 'unknown', value, raw } = req.body;
 
     if (!device_id || value === null) {
@@ -61,7 +61,16 @@ app.post('/api/save_data', async (req, res) => {
 
         // 2. Simpan data sensor (Logic dari save_data.php)
         const [result] = await connection.query(
-            "INSERT INTO sensor_data (device_id, sensor_type, value, raw_value) VALUES (?, ?, ?, ?)",
+              `
+                INSERT INTO airsys (device_id, sensor_type, value, raw_value)
+                VALUES (?, ?, ?, ?);
+
+                INSERT INTO firesys (device_id, sensor_type, value, raw_value)
+                VALUES (?, ?, ?, ?);
+
+                INSERT INTO secusys (device_id, sensor_type, value, raw_value)
+                VALUES (?, ?, ?, ?);
+                `,
             [device_id, sensor_type, value, raw]
         );
         
@@ -87,7 +96,7 @@ app.post('/api/save_data', async (req, res) => {
 
 
 // --- 2. Konversi API: GET /api/get_command.php (Polling dari ESP32) ---
-app.get('/api/get_command', async (req, res) => {
+app.get('/api_pdo/get_command', async (req, res) => {
     const device_id = req.query.device_id;
     if (!device_id) {
         return res.status(400).json({ error: 'Missing device_id' });
@@ -121,7 +130,7 @@ app.get('/api/get_command', async (req, res) => {
 
 // --- 3. Konversi API: POST /api/set_command.php (Pengiriman Perintah dari Web PHP) ---
 // Rute ini dipanggil oleh logic/lampu.logic.php
-app.post('/api/set_command', async (req, res) => {
+app.post('/api_pdo/set_command', async (req, res) => {
     const { device_id, command, payload = null } = req.body;
 
     if (!device_id || !command) {
@@ -148,7 +157,7 @@ app.post('/api/set_command', async (req, res) => {
 
 
 // --- 4. Konversi API: POST /api/ack_command.php (Konfirmasi Eksekusi dari ESP32) ---
-app.post('/api/ack_command', async (req, res) => {
+app.post('/api_pdo/ack_command', async (req, res) => {
     const { command_id, result: command_result } = req.body;
 
     if (!command_id) {
@@ -177,7 +186,7 @@ app.post('/api/ack_command', async (req, res) => {
 });
 
 // --- 5. Konversi API: GET /api/get_sensor_data.php (Untuk Menampilkan di Dashboard Web) ---
-app.get('/api/get_sensor_data', async (req, res) => {
+app.get('/api_pdo/get_sensor_data', async (req, res) => {
     const device_id = req.query.device_id;
     if (!device_id) {
         return res.status(400).json({ error: 'Missing device_id' });

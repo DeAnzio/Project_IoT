@@ -39,8 +39,8 @@ if($suhu < 18 || $suhu > 35){
         <img src="content/stripheader.png" alt="Logo" class="logo-clickable">
         <div class="dropdown-menu">
             <a href="dashboard.php">Dashboard</a>
-            <a href="gudangInv.php">Ruang Inventaris</a>
-            <a href="logsm.php">Data Log</a>
+            <a href="gudangsm.php">Ruang Supply</a>
+            <a href="loginv.php">Data Log</a>
         </div>
     </div>
         <div class="title">Info Ruangan</div>

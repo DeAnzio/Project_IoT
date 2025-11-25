@@ -44,13 +44,16 @@
             <table class="activity-table">
                 <thead>
                     <tr>
-                        <th>Hari / Tanggal</th>
-                        <th>Jam</th>
+                        <th>Tanggal / Jam</th>
                         <th>Gerakan</th>
                         <th>Pintu</th>
                     </tr>
                 </thead>
-                <tbody id="activityTable"></tbody>
+                <tbody id="sensor-table-body">
+                    <tr>
+                        <td colspan="4" class="text-center">Memuat data...</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -73,5 +76,38 @@
             }
         });
     });
+
+        const deviceId = "esp32-unit-003";
+    const tableBody = document.getElementById("sensor-table-body");
+
+    async function loadData() {
+      try {
+        const response = await fetch(`http://localhost/project_iot/api_pdo/get_sensor_data.php?device_id=${deviceId}`); // PHP
+        // const response = await fetch(`http://localhost:3000/api_pdo/get_sensor_data?device_id=${deviceId}`); // JS
+        const datas = await response.json();
+
+        if (!datas || datas.length === 0) {
+          tableBody.innerHTML = `<tr><td colspan="4" class="text-center">Tidak Ada Data</td></tr>`;
+          return;
+        }
+
+        tableBody.innerHTML = datas.map((data, index) => `
+          <tr>
+            <td>${data.recorded_at}</td>
+            <td>${data.value}</td>
+            <td>${data.raw_value}</td>
+          </tr>
+        `).join('');
+      } catch (error) {
+        tableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Gagal memuat data</td></tr>`;
+        console.error(error);
+      }
+    }
+
+    // Load data pertama kali
+    loadData();
+
+    // Perbarui setiap 5 detik
+    setInterval(loadData, 5000);
 </script>
 </html>

@@ -138,14 +138,15 @@ if($suhu < 18 || $suhu > 35){
                 <h2 class="titlesuhulembab">Kontrol Perangkat</h2>
             <div class="card-right-bottom-content">
             <!-- tombol ON/OFF -->
-                <div class="button-container">
-                    <button class="power-button" id="powerBtn">
+            <div class="button-container">
+                <form action="logic/lampu.logic.php" method="GET">                    
+                    <button type="submit" class="power-button" id="powerBtn" name="lampu_off" value="true">
                         <div class="button-ring off" id="ring"></div>
                         <span class="button-text">ON / OFF</span>
                     </button>
-                    <div class="status-text off" id="status">OFF</div>
-                </div>
-
+                </form>
+                <div class="status-text off" id="status">OFF</div>
+            </div>
                 <div class="menu-right">
                     <div class="menu-item">
                         <img src="content/autobutton.png" alt="auto">
@@ -182,31 +183,51 @@ if($suhu < 18 || $suhu > 35){
         });
     });
 
-        const powerBtn = document.getElementById('powerBtn');
-        const ring = document.getElementById('ring');
-        const status = document.getElementById('status');
-        let isOn = false;
+const powerBtn = document.getElementById('powerBtn');
+const ring = document.getElementById('ring');
+const status = document.getElementById('status');
+let isOn = false;
 
-        powerBtn.addEventListener('click', function() {
-            isOn = !isOn;
-            
-            if (isOn) {
-                ring.classList.remove('off');
-                ring.classList.add('on');
-                status.classList.remove('off');
-                status.classList.add('on');
-                status.textContent = 'ON';
-            } else {
-                ring.classList.remove('on');
-                ring.classList.add('off');
-                status.classList.remove('on');
-                status.classList.add('off');
-                status.textContent = 'OFF';
+powerBtn.addEventListener('click', function(e) {
+    e.preventDefault(); // Mencegah submit form
+    
+    isOn = !isOn;
+    
+    const param = isOn ? 'lampu_on' : 'lampu_off';
+    
+    // Update UI
+    if (isOn) {
+        ring.classList.remove('off');
+        ring.classList.add('on');
+        status.classList.remove('off');
+        status.classList.add('on');
+        status.textContent = 'ON';
+    } else {
+        ring.classList.remove('on');
+        ring.classList.add('off');
+        status.classList.remove('on');
+        status.classList.add('off');
+        status.textContent = 'OFF';
+    }
+    
+    // Kirim request via AJAX
+    fetch(`logic/lampu.logic.php?${param}=true`)
+        .then(response => {
+            if (!response.ok) {
+                console.error('Request gagal');
+                // Kembalikan state jika gagal
+                isOn = !isOn;
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Kembalikan state jika error
+            isOn = !isOn;
         });
+});
 
-                    let isActive = true;
-        let currentMode = 'auto';
+let isActive = true;
+let currentMode = 'auto';
 
         // Toggle Status Function
         function toggleStatus() {

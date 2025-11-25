@@ -15,7 +15,7 @@ if (!$device_id) {
 }
 
 // Ambil 50 data terakhir
-$stmt = $pdo->prepare("SELECT value, recorded_at FROM sensor_data
+$stmt = $pdo->prepare("SELECT value,raw_value, recorded_at FROM airsys
                        WHERE device_id = :id
                        ORDER BY recorded_at DESC
                        LIMIT 50");
