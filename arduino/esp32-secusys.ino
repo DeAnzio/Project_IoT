@@ -4,18 +4,19 @@
 
 #define MAGNETIC_PIN 5   // Pin untuk Magnetic Sensor (Reed Switch)
 #define PIR_PIN 18       // Pin untuk PIR Sensor
-#define LED_BUILTIN 2
+#define LED 2 // pin Led
+#define buzzer 19 // Pin buzz
 
 // Konfigurasi WiFi dan server
-const char* ssid = "YOUR_SSID";                       // Nama WiFi Kamu
-const char* password = "YOUR_WIFI_PASS";              // Password WiFI Kamu
+const char* ssid = "Hitam_Legam";                       // Nama WiFi Kamu
+const char* password = "00000000";              // Password WiFI Kamu
 const char* server = "http://your-domain.or.ip/project_iot/api_pdo";  // IP PC kamu - PHP 
 // const char* server = "http://your-domain.or.ip:3000/api";  // IP PC kamu - Express
 const char* DEVICE_ID = "esp32-unit-003";             // (opsional) untuk ngasih tau Device aja
 
 // Untuk ngatur waktu
 unsigned long lastSend = 0;
-const unsigned long sendInterval = 15 * 1000UL; // kirim tiap 15 detik
+const unsigned long sendInterval = 2 * 1000UL; // kirim tiap 15 detik
 unsigned long lastPoll = 0;
 const unsigned long pollInterval = 2 * 1000UL; // cek perintah tiap 2 detik
 
@@ -164,10 +165,10 @@ void executeCommand(long id, String cmd, String payload){
   
   // HANYA EKSEKUSI AKTUATOR - TANPA PROSES LOGIKA
   if (cmd == "lampu_on") {
-    digitalWrite(LED_BUILTIN, HIGH);
+    digitalWrite(LED, HIGH);
     result = "lampu_on_ok";
   } else if (cmd == "lampu_off") {
-    digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(LED, LOW);
     result = "lampu_off_ok";
   } else {
     result = "cmd_not_supported";

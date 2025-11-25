@@ -17,12 +17,12 @@ DHT dht(DHTPIN, DHTTYPE);
 // Konfigurasi WiFi dan Server
 const char* ssid = "YOUR_SSID";                       // Nama WiFi Kamu
 const char* password = "YOUR_WIFI_PASS";              // Password WiFI Kamu
-const char* server = "http://your-domain.or.ip/project_iot/api";  // IP Server
+const char* server = "http://your-domain.or.ip/project_iot/api_pdo";  // IP Server
 const char* DEVICE_ID = "esp32-unit-002";             // ID Device
 
 // Pengaturan Waktu
 unsigned long lastSend = 0;
-const unsigned long sendInterval = 15 * 1000UL; // Kirim data tiap 15 detik
+const unsigned long sendInterval = 2 * 1000UL; // Kirim data tiap 15 detik
 
 unsigned long lastPoll = 0;
 const unsigned long pollInterval = 2 * 1000UL;  // Cek perintah tiap 2 detik
@@ -88,7 +88,7 @@ void sendSensorData(){
     return;
   }
   
-  // Tampilkan data di Serial Monitor
+  // Tampilkan data di Serial Monitor (debug)
   Serial.println("=== Sensor Data ===");
   Serial.printf("Temperature: %.2f°C\n", temperature);
   Serial.printf("Humidity: %.2f%%\n", humidity);
@@ -99,7 +99,7 @@ void sendSensorData(){
     HTTPClient http;
     
     // === Kirim Data Temperature ===
-    String url = String(server) + "/save_data.php";
+    String url = String(server) + "/save_data_firesys.php";
     http.begin(url);
     http.addHeader("Content-Type", "application/json");
     

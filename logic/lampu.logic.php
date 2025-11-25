@@ -7,9 +7,17 @@ if (isset($_GET['lampu_on']) || isset($_GET['lampu_off'])) {
   // $url       = "http://localhost:3000/api_pdo/set_command"; //Express
 
   // Buat data JSON untuk dikirim ke API
+  // add a payload to help tracking who/when triggered the command
+  $payloadObj = [
+    'source' => 'web',
+    'action' => $COMMAND,
+    'ts'     => date('c')
+  ];
+
   $data = [
     'device_id' => $DEVICE_ID,
-    'command'   => $COMMAND
+    'command'   => $COMMAND,
+    'payload'   => json_encode($payloadObj)
   ];
 
   // Kirim JSON via POST
@@ -21,6 +29,13 @@ if (isset($_GET['lampu_on']) || isset($_GET['lampu_off'])) {
 
   // Eksekusi perintah
   $result = curl_exec($ch);
+  if ($result === false) {
+    $err = curl_error($ch);
+    curl_close($ch);
+    http_response_code(500);
+    echo json_encode(['error' => 'cURL error', 'detail' => $err]);
+    exit;
+  }
   curl_close($ch);
 
   // Buat response JSON dari hasil perintah

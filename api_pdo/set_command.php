@@ -22,9 +22,10 @@ if (!$input) {
 // }
 
 // Nangkap Data JSON
-$device_id = $input['device_id'] ?? null;
-$command   = $input['command'] ?? null;
-$payload   = $input['payload'] ?? null;
+// extract raw values
+$device_id = isset($input['device_id']) ? $input['device_id'] : null;
+$command   = isset($input['command']) ? $input['command'] : null;
+$payload   = isset($input['payload']) ? $input['payload'] : null;
 
 // Cek apakah device_id dan command ada
 if (!$device_id || !$command) {
@@ -33,22 +34,15 @@ if (!$device_id || !$command) {
     exit;
 }
 
-// Escape data untuk keamanan
-$device_id = $pdo->quote($device_id);
-$command   = $pdo->quote($command);
-$payload   = $pdo->quote($payload);
-
-// Simpan perintah baru
-$stmt = $pdo->prepare("INSERT INTO commands (device_id, command, payload)
-                       VALUES (:device_id, :cmd, :payload)");
-$stmt->execute([
+// Simpan perintah baru (gunakan binding parameter --- jangan quote manual)
+$stmt = $pdo->prepare("INSERT INTO commands (device_id, command, payload) VALUES (:device_id, :cmd, :payload)");
+$ok = $stmt->execute([
     ':device_id' => $device_id,
     ':cmd'       => $command,
     ':payload'   => $payload
 ]);
 
-// Cek apakah simpan berhasil
-if (!$stmt) {
+if (!$ok) {
     http_response_code(500);
     echo json_encode(['error' => 'Failed to save command']);
     exit;

@@ -1,28 +1,4 @@
 
-<?php
-require_once __DIR__ . '/config/auth.php';
-// contoh data dari backend (bisa diganti dari database / ESP32 API)
-$kelembapan = 75;
-$suhu       = 29;
-
-// status kelembapan
-if($kelembapan > 70){
-    $status_kelembapan = "High";
-    $color_kelembapan  = "high";
-} else {
-    $status_kelembapan = "Ideal";
-    $color_kelembapan  = "ideal";
-}
-
-// status suhu
-if($suhu < 18 || $suhu > 35){
-    $status_suhu = "Warning";
-    $color_suhu  = "high";
-} else {
-    $status_suhu = "Ideal";
-    $color_suhu  = "ideal";
-}
-?>
 
 
 <!DOCTYPE html>
@@ -113,23 +89,22 @@ if($suhu < 18 || $suhu > 35){
         <div class="card-right-top">
             <h2 class="titlesuhulembab">Kondisi Saat Ini</h2>
 
-            <!-- kelembapan -->
-            <div class="status-box <?= $color_kelembapan ?>">
+            <div class="status-box bg-secondary" id="kelembapan-box">
                 <img class="icon" src="content/logolembab.png" style="width:50px;height:50px;" />
-                <div>
-                    <p>Kelembapan : <?= $kelembapan ?> %</p>
-                    <p>Status : <?= $status_kelembapan ?></p>
+                <div id="kelembapan-content">
+                    <p id="kelembapan-value">Kelembapan : -- %</p>
+                    <p id="kelembapan-status">Status : Memuat...</p>
                 </div>
             </div>
 
-            <!-- suhu -->
-            <div class="status-box <?= $color_suhu ?>">
+            <!-- Suhu -->
+            <div class="status-box bg-secondary" id="suhu-box">
                 <div class="icon">
                     <img class="icon" src="content/logosuhu.png" style="width:50px;height:50px;" />
                 </div>
-                <div>
-                    <p>Suhu : <?= $suhu ?> °C</p>
-                    <p>Status : <?= $status_suhu ?></p>
+                <div id="suhu-content">
+                    <p id="suhu-value">Suhu : -- °C</p>
+                    <p id="suhu-status">Status : Memuat...</p>
                 </div>
             </div>
         </div>
@@ -140,7 +115,7 @@ if($suhu < 18 || $suhu > 35){
             <!-- tombol ON/OFF -->
             <div class="button-container">
                 <form action="logic/lampu.logic.php" method="GET">                    
-                    <button type="submit" class="power-button" id="powerBtn" name="lampu_off" value="true">
+                    <button type="submit" class="power-button" id="powerBtn" name="" value="true">
                         <div class="button-ring off" id="ring"></div>
                         <span class="button-text">ON / OFF</span>
                     </button>
@@ -309,6 +284,8 @@ let currentMode = 'auto';
             });
         }
 
+
+
         // Load Status from Server
         function loadStatus() {
             fetch('get_status.php')
@@ -343,10 +320,49 @@ let currentMode = 'auto';
                 });
         }
 
+const deviceId = "esp32-unit-001";
+
+async function loadData() {
+  try {
+    const response = await fetch(`http://localhost/project_iot/api_pdo/get_sensor_data.php?device_id=${deviceId}`);
+    const datas = await response.json();
+
+    if (!datas || datas.length === 0) {
+      console.log('Tidak ada data');
+      return;
+    }
+
+    // Ambil data terbaru
+    const latestData = datas[0];
+    
+    // Update kelembapan
+    const kelembapan = latestData.humidity || latestData.kelembapan || 0;
+    const statusKelembapan = kelembapan < 30 ? 'Kering' : kelembapan > 70 ? 'Lembap' : 'Normal';
+    const colorKelembapan = kelembapan < 30 ? 'bg-danger' : kelembapan > 70 ? 'bg-warning' : 'bg-success';
+    
+    document.getElementById('kelembapan-box').className = `status-box ${colorKelembapan}`;
+    document.getElementById('kelembapan-value').textContent = `Kelembapan : ${kelembapan} %`;
+    document.getElementById('kelembapan-status').textContent = `Status : ${statusKelembapan}`;
+
+    // Update suhu
+    const suhu = latestData.temperature || latestData.suhu || 0;
+    const statusSuhu = suhu < 20 ? 'Dingin' : suhu > 30 ? 'Panas' : 'Normal';
+    const colorSuhu = suhu < 20 ? 'bg-primary' : suhu > 30 ? 'bg-danger' : 'bg-success';
+    
+    document.getElementById('suhu-box').className = `status-box ${colorSuhu}`;
+    document.getElementById('suhu-value').textContent = `Suhu : ${suhu} °C`;
+    document.getElementById('suhu-status').textContent = `Status : ${statusSuhu}`;
+
+  } catch (error) {
+    console.error('Gagal memuat data:', error);
+  }
+}
+
         // Auto refresh every 5 seconds
         setInterval(loadStatus, 5000);
 
         // Load initial status
+        loadData();
         loadStatus();
     </script>
 </body>

@@ -135,7 +135,20 @@ if($suhu < 18 || $suhu > 35){
     <div class="card-right">
         <div class="card-right-top">
             <h2 class="titlestakat">Activity Status</h2>
-
+            <table class="activity-table">
+                <thead>
+                    <tr>
+                        <th>Tanggal / Jam</th>
+                        <th>Gerakan</th>
+                        <th>Pintu</th>
+                    </tr>
+                </thead>
+                <tbody id="sensor-table-body">
+                    <tr>
+                        <td colspan="4" class="text-center">Memuat data...</td>
+                    </tr>
+                </tbody>
+            </table>
             
         </div>
         
@@ -282,6 +295,59 @@ if($suhu < 18 || $suhu > 35){
                     console.error('Error loading status:', error);
                 });
         }
+
+    const deviceId = "esp32-unit-003";
+    const tableBody = document.getElementById("sensor-table-body");
+
+function detectSensorColumn(sensorType, raw) {
+  const s = ((sensorType || raw) + '').toLowerCase();
+  if (s.includes('pir') || s.includes('motion')) return 'motion';
+  if (s.includes('mc38') || s.includes('mag') || s.includes('magnetic') || s.includes('door') || s.includes('pintu')) return 'door';
+  return null;
+}
+
+async function loadData() {
+  try {
+    const response = await fetch(`http://localhost/project_iot/api_pdo/get_sensor_data_secusys.php?device_id=${deviceId}`);
+    const datas = await response.json();
+
+    if (!datas || datas.length === 0) {
+      tableBody.innerHTML = `<tr><td colspan="3" class="text-center">Tidak Ada Data</td></tr>`;
+      return;
+    }
+
+    // Group records by exact timestamp (recorded_at); merge PIR and MAG readings per timestamp
+    const map = {};
+    datas.forEach(d => {
+      const time = d.recorded_at || d.recorded_at_local || new Date().toISOString();
+      if (!map[time]) map[time] = { recorded_at: time, motion: null, door: null };
+      const col = detectSensorColumn(d.sensor_type, d.raw_value || d.raw);
+      const val = (d.value !== undefined && d.value !== null) ? d.value : (d.raw_value !== undefined ? d.raw_value : null);
+
+      if (col === 'motion') map[time].motion = val;
+      if (col === 'door') map[time].door = val;
+    });
+
+    // Sort timestamps descending (newest first)
+    const rows = Object.values(map).sort((a, b) => new Date(b.recorded_at) - new Date(a.recorded_at));
+
+    tableBody.innerHTML = rows.map(r => {
+      const motionCell = (r.motion == 1 || r.motion === '1' ? '1' : '0');
+      const doorCell = (r.door === null || r.door === undefined) ? '-' : ((r.door == 1 || r.door === '1') ? 'Terbuka' : 'Tertutup');
+      return `<tr>
+                <td>${r.recorded_at}</td>
+                <td>${motionCell}</td>
+                <td>${doorCell}</td>
+              </tr>`;
+    }).join('');
+
+  } catch (error) {
+    tableBody.innerHTML = `<tr><td colspan="3" class="text-center text-danger">Gagal memuat data</td></tr>`;
+    console.error('Gagal memuat data:', error);
+  }
+}
+    // Load data pertama kali
+    loadData();
 
         // Auto refresh every 5 seconds
         setInterval(loadStatus, 5000);

@@ -3,22 +3,24 @@
 #include <DHT.h>          // Libray DHT Sensor Library by 
 #include <ArduinoJson.h>  // Library ArduinoJson
 
-#define DHTPIN 14      // pin DHT Pin - Data Sensor
+#define DHTPIN 2      // pin DHT Pin - Data Sensor
 #define DHTTYPE DHT11  // pin Type DHT11 - Tipe Sensor
 DHT dht(DHTPIN, DHTTYPE);
 
-#define FANRELAY 2
+#define FANRELAY 4 //pin ke Relay Fan
+
+//10.35.125.230
 
 // konfigurasi WiFi dan server
-const char* ssid = "YOUR_SSID";                       // Nama WiFi Kamu
-const char* password = "YOUR_WIFI_PASS";              // Password WiFI Kamu
-const char* server = "http://your-domain.or.ip/iot_app/api_pdo";  // IP PC kamu - PHP (updated to api_pdo shim)
+const char* ssid = "Hitam_Legam";                       // Nama WiFi Kamu
+const char* password = "00000000";              // Password WiFI Kamu
+const char* server = "http://your-domain.or.ip/project_app/api_pdo";  // IP PC kamu - PHP (updated to api_pdo shim)
 // const char* server = "http://your-domain.or.ip:3000/api";  // IP PC kamu - Express
 const char* DEVICE_ID = "esp32-unit-001";             // (opsional) untuk ngasih tau Device aja
 
 // Untuk ngatur waktu
 unsigned long lastSend = 0;
-const unsigned long sendInterval = 15 * 1000UL; // kirim tiap 15 detik
+const unsigned long sendInterval = 2 * 1000UL; // kirim tiap 15 detik
 // const unsigned long sendInterval = 5 * 1000UL; // kirim tiap 5 detik
 unsigned long lastPoll = 0;
 const unsigned long pollInterval = 2 * 1000UL; // cek perintah tiap 2 detik

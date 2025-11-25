@@ -85,8 +85,8 @@
 
     async function loadData() {
       try {
-        const response = await fetch(`http://localhost/project_iot/api_pdo/get_sensor_data.php?device_id=${deviceId}`); // PHP
-        // const response = await fetch(`http://localhost:3000/api_pdo/get_sensor_data?device_id=${deviceId}`); // JS
+        const response = await fetch(`http://localhost/project_iot/api_pdo/get_sensor_data_airsys.php?device_id=${deviceId}`); // PHP
+        // const response = await fetch(`http://localhost:3000/api_pdo/get_sensor_data_airsys?device_id=${deviceId}`); // JS
         const datas = await response.json();
 
         if (!datas || datas.length === 0) {
