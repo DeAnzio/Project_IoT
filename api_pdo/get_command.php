@@ -22,12 +22,21 @@ if (!$device_id) {
     exit;
 }
 
-// Ambil perintah pending paling awal
+// Prioritize any pending 'buzzer_off' (stop) commands so device can stop immediately
 $stmt = $pdo->prepare("SELECT id, command, payload FROM commands
-                       WHERE device_id = :id AND status = 'pending'
+                       WHERE device_id = :id AND status = 'pending' AND command = 'buzzer_off'
                        ORDER BY created_at ASC LIMIT 1");
 $stmt->execute([':id' => $device_id]);
 $cmd = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// If there's no buzzer_off, return the oldest pending command
+if (!$cmd) {
+    $stmt = $pdo->prepare("SELECT id, command, payload FROM commands
+                           WHERE device_id = :id AND status = 'pending'
+                           ORDER BY created_at ASC LIMIT 1");
+    $stmt->execute([':id' => $device_id]);
+    $cmd = $stmt->fetch(PDO::FETCH_ASSOC);
+}
 
 // Jika ada perintah pending, kembalikan perintah tersebut
 if ($cmd) {

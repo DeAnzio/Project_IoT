@@ -181,26 +181,47 @@ if($suhu < 18 || $suhu > 35){
 
             let isActive = true;
         let currentMode = 'auto';
+let alarmActive = false; // track status alarm
 
-        // Toggle Status Function
-        function toggleStatus() {
-            isActive = !isActive;
-            const statusText = document.getElementById('statusText');
-            const toggleBtn = document.getElementById('toggleBtn');
+// Toggle Status Function (untuk alarm)
+function toggleStatus() {
+    alarmActive = !alarmActive;
+    const statusText = document.getElementById('statusText');
+    const toggleBtn = document.getElementById('toggleBtn');
 
-            if (isActive) {
-                statusText.textContent = 'Active';
-                statusText.className = 'status-active';
-                toggleBtn.classList.remove('inactive');
-            } else {
-                statusText.textContent = 'Inactive';
-                statusText.className = 'status-inactive';
-                toggleBtn.classList.add('inactive');
-            }
+    if (alarmActive) {
+        statusText.textContent = 'Active';
+        statusText.className = 'status-active';
+        toggleBtn.classList.remove('inactive');
+    } else {
+        statusText.textContent = 'Inactive';
+        statusText.className = 'status-inactive';
+        toggleBtn.classList.add('inactive');
+    }
 
-            // Send status to server
-            updateStatusToServer(isActive);
-        }
+    // Send alarm status to server
+    fetch('logic/alarm.logic.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            action: alarmActive ? 'on' : 'off',
+            device_id: 'esp32-unit-003'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Alarm status sent:', data);
+    })
+    .catch(error => {
+        console.error('Error sending alarm status:', error);
+        // revert state jika gagal
+        alarmActive = !alarmActive;
+        statusText.textContent = alarmActive ? 'Active' : 'Inactive';
+        statusText.className = alarmActive ? 'status-active' : 'status-inactive';
+    });
+}
 
         // Set Mode Function
         function setMode(mode) {
