@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Log Gudang</title>
     <link rel="stylesheet" href="content/style/styleloginv.css">
     <link rel="stylesheet" href="content/style/header.css">
+    <link rel="stylesheet" href="content/style/notifications.css">
 </head>
 <body>
     <header class="header">
@@ -15,7 +16,7 @@
             <img src="content/stripheader.png" alt="Logo" class="logo-clickable">
             <div class="dropdown-menu">
                 <a href="dashboard.php">Dashboard</a>
-                <a href="gudangInv.php">Ruang Inventaris</a>
+                <a href="gudangsm.php">Gudang</a>
                 <a href="logsm.php">Data Log</a>
             </div>
         </div>
@@ -36,25 +37,29 @@
     <div class="container">
         <div class="section">
             <h2>Notification</h2>
-            <div id="notifications"></div>
+            <div id="notifications" class="notification-container">
+                <div class="notification-empty">Tidak ada notifikasi</div>
+            </div>
         </div>
 
         <div class="section">
             <h2>Activity Status</h2>
-            <table class="activity-table">
-                <thead>
-                    <tr>
-                        <th>Tanggal / Jam</th>
-                        <th>Gerakan</th>
-                        <th>Pintu</th>
-                    </tr>
-                </thead>
-                <tbody id="sensor-table-body">
-                    <tr>
-                        <td colspan="4" class="text-center">Memuat data...</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-wrapper">
+                <table class="activity-table">
+                    <thead>
+                        <tr>
+                            <th>Tanggal / Jam</th>
+                            <th>Gerakan</th>
+                            <th>Pintu</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sensor-table-body">
+                        <tr>
+                            <td colspan="4" class="text-center">Memuat data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </body>
@@ -79,6 +84,85 @@
 
         const deviceId = "esp32-unit-003";
     const tableBody = document.getElementById("sensor-table-body");
+    const notificationsContainer = document.getElementById("notifications");
+    const notifiedAlerts = new Set(); // Track yang sudah di-notify
+
+    /**
+     * Menampilkan notifikasi alert
+     */
+    function showSecurityAlert(message, type = 'warning') {
+        // Hapus pesan "Tidak ada notifikasi" jika ada
+        const emptyMsg = notificationsContainer.querySelector('.notification-empty');
+        if (emptyMsg) {
+            emptyMsg.remove();
+        }
+
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <span>${message}</span>
+            <button class="notification-close">×</button>
+        `;
+
+        // Close button handler
+        notification.querySelector('.notification-close').addEventListener('click', function() {
+            removeSecurityAlert(notification);
+        });
+
+        notificationsContainer.appendChild(notification);
+
+        // Auto remove after 10 seconds
+        setTimeout(() => {
+            removeSecurityAlert(notification);
+        }, 10000);
+    }
+
+    /**
+     * Menghapus alert dengan animasi
+     */
+    function removeSecurityAlert(notificationEl) {
+        notificationEl.classList.add('removing');
+        setTimeout(() => {
+            notificationEl.remove();
+            // Show empty message jika tidak ada notifikasi lagi
+            if (notificationsContainer.children.length === 0) {
+                notificationsContainer.innerHTML = '<div class="notification-empty">Tidak ada notifikasi</div>';
+            }
+        }, 300);
+    }
+
+    /**
+     * Check sensor data dan trigger alert jika ada gerakan atau pintu terbuka
+     */
+    function checkSecurityAlerts(latestData) {
+        const timestamp = latestData.recorded_at || new Date().toISOString();
+        const motion = latestData.motion;
+        const door = latestData.door;
+
+        // Check gerakan (PIR)
+        if (motion === 1 || motion === '1') {
+            const motionKey = `${timestamp}-motion`;
+            if (!notifiedAlerts.has(motionKey)) {
+                showSecurityAlert(
+                    `🚨 GERAKAN TERDETEKSI pada ${new Date(timestamp).toLocaleTimeString('id-ID')}`,
+                    'error'
+                );
+                notifiedAlerts.add(motionKey);
+            }
+        }
+
+        // Check pintu (Magnetic Sensor)
+        if (door === 1 || door === '1') {
+            const doorKey = `${timestamp}-door`;
+            if (!notifiedAlerts.has(doorKey)) {
+                showSecurityAlert(
+                    `🚨 PINTU TERBUKA pada ${new Date(timestamp).toLocaleTimeString('id-ID')}`,
+                    'error'
+                );
+                notifiedAlerts.add(doorKey);
+            }
+        }
+    }
 
     function detectSensorColumn(sensorType, raw) {
   const s = ((sensorType || raw) + '').toLowerCase();
@@ -111,6 +195,11 @@ async function loadData() {
 
     // Sort timestamps descending (newest first)
     const rows = Object.values(map).sort((a, b) => new Date(b.recorded_at) - new Date(a.recorded_at));
+
+    // Check latest data untuk alert jika ada gerakan/pintu terbuka
+    if (rows.length > 0) {
+      checkSecurityAlerts(rows[0]);
+    }
 
     tableBody.innerHTML = rows.map(r => {
       const motionCell = (r.motion == 1 || r.motion === '1' ? '1' : '0');

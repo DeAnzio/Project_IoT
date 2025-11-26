@@ -28,9 +28,10 @@ if($suhu < 18 || $suhu > 35){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoring Inventaris</title>
+    <title>Monitoring Gudang</title>
       <link rel="stylesheet" href="content/style/header.css">
       <link rel="stylesheet" href="content/style/styleinv.css">
+      <link rel="stylesheet" href="content/style/notifications.css">
 </head>
 <body>
 <header class="header">
@@ -39,7 +40,7 @@ if($suhu < 18 || $suhu > 35){
         <img src="content/stripheader.png" alt="Logo" class="logo-clickable">
         <div class="dropdown-menu">
             <a href="dashboard.php">Dashboard</a>
-            <a href="gudangsm.php">Ruang Supply</a>
+            <a href="gudangsm.php">Ruang Inventaris</a>
             <a href="loginv.php">Data Log</a>
         </div>
     </div>
@@ -61,15 +62,14 @@ if($suhu < 18 || $suhu > 35){
     <!-- Info Gudang -->
     <div class="card-left">
         <div class="card-left-top">
-            <h2 class="titlestakat">Gudang Inventaris</h2>
+            <h2 class="titlestakat">Gudang </h2>
                 <div class="device-row">
                     <div class="device-icon">
                         <img src="content/LogoGudangMakanan.png" alt="Logo">
                     </div>
                     <div class="devicedesc">
                         <div class="deviceline">
-
-                            <p >2 Device</p>
+                            <p>SecuSys</p>
                         </div>
                         <div class="statusline">
                             <div class="statusleft">
@@ -87,39 +87,39 @@ if($suhu < 18 || $suhu > 35){
             <div class="card-left-bottom-content">
                 <div class = "left-bottom-left">
                 <!-- kiri -->
-                    <div class="status-box <?= $color_kelembapan ?>">
-                        <img class="icon" src="content/logolembab.png" style="width:50px;height:50px;" />
-                        <div>
-                            <p>Kelembapan : <?= $kelembapan ?> %</p>
-                            <p>Status : <?= $status_kelembapan ?></p>
+                    <div class="status-box">
+                        <img class="icon" src="content/logomagnetik.png" style="width:50px;height:50px;" />
+                        <div class="status-text-box">
+                             <p><b>Magnetic Sensor</b></p>
+                            <p><b>Status : Stanby</b></p>
                         </div>
                     </div>
-                    <div class="status-box <?= $color_kelembapan ?>">
-                        <img class="icon" src="content/logolembab.png" style="width:50px;height:50px;" />
-                        <div>
-                            <p>Kelembapan : <?= $kelembapan ?> %</p>
-                            <p>Status : <?= $status_kelembapan ?></p>
+                    <div class="status-box ">
+                        <img class="icon" src="content/logopir.png" style="width:40px;height:40px;" />
+                        <div class="status-text-box">
+                            <p><b>PIR Sensor</b></p>
+                            <p><b>Status : Stanby</b></p>
                         </div>
                     </div>
                 </div>
                 <div clsas = "left-bottom-right">
                 <!-- kanan -->
-                    <div class="status-box <?= $color_suhu ?>">
+                    <div class="status-box">
                         <div class="icon">
-                            <img class="icon" src="content/logosuhu.png" style="width:50px;height:50px;" />
+                            <img class="icon" src="content/logoalrm.png" style="width:40px;height:40px;" />
                         </div>
-                        <div>
-                            <p>Suhu : <?= $suhu ?> °C</p>
-                            <p>Status : <?= $status_suhu ?></p>
+                        <div class="status-text-box">
+                            <p><b>Alarm</b></p>
+                            <p><b>Status : Stanby</b></p>
                         </div>
                     </div>
-                    <div class="status-box <?= $color_suhu ?>">
+                    <div class="status-box">
                         <div class="icon">
-                            <img class="icon" src="content/logosuhu.png" style="width:50px;height:50px;" />
+                            <img class="icon" src="content/logoled.png" style="width:50px;height:50px;" />
                         </div>
-                        <div>
-                            <p>Suhu : <?= $suhu ?> °C</p>
-                            <p>Status : <?= $status_suhu ?></p>
+                        <div class="status-text-box">
+                            <p><b>LED</b></p>
+                            <p><b>Status : Stanby</b></p>
                         </div>
                     </div>
                 </div>    
@@ -135,26 +135,29 @@ if($suhu < 18 || $suhu > 35){
     <div class="card-right">
         <div class="card-right-top">
             <h2 class="titlestakat">Activity Status</h2>
-            <table class="activity-table">
-                <thead>
-                    <tr>
-                        <th>Tanggal / Jam</th>
-                        <th>Gerakan</th>
-                        <th>Pintu</th>
-                    </tr>
-                </thead>
-                <tbody id="sensor-table-body">
-                    <tr>
-                        <td colspan="4" class="text-center">Memuat data...</td>
-                    </tr>
-                </tbody>
-            </table>
-            
+            <div class="table-wrapper">
+                <table class="activity-table">
+                    <thead>
+                        <tr>
+                            <th>Tanggal / Jam</th>
+                            <th>Gerakan</th>
+                            <th>Pintu</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sensor-table-body">
+                        <tr>
+                            <td colspan="4" class="text-center">Memuat data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
         
         <div class="card-right-bottom">
                 <h2 class="titlestakat">Notification</h2>
-        <div class="card-right-bottom-content">
+        <div id="notifications" class="notification-container card-right-bottom-content">
+            <div class="notification-empty">Tidak ada notifikasi</div>
+        </div>
     </div>
 
 </section>
@@ -319,6 +322,88 @@ function toggleStatus() {
 
     const deviceId = "esp32-unit-003";
     const tableBody = document.getElementById("sensor-table-body");
+    const notificationsContainer = document.getElementById("notifications");
+    const notifiedAlerts = new Set(); // Track yang sudah di-notify
+
+    /**
+     * Menampilkan notifikasi alert
+     */
+    function showSecurityAlert(message, type = 'warning') {
+        // Hapus pesan "Tidak ada notifikasi" jika ada
+        const emptyMsg = notificationsContainer.querySelector('.notification-empty');
+        if (emptyMsg) {
+            emptyMsg.remove();
+        }
+
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <span>${message}</span>
+            <button class="notification-close">×</button>
+        `;
+
+        // Close button handler
+        notification.querySelector('.notification-close').addEventListener('click', function() {
+            removeSecurityAlert(notification);
+        });
+
+        notificationsContainer.appendChild(notification);
+
+        // Auto remove after 10 seconds
+        setTimeout(() => {
+            removeSecurityAlert(notification);
+        }, 10000);
+    }
+
+    /**
+     * Menghapus alert dengan animasi
+     */
+    function removeSecurityAlert(notificationEl) {
+        notificationEl.classList.add('removing');
+        setTimeout(() => {
+            notificationEl.remove();
+            // Show empty message jika tidak ada notifikasi lagi
+            if (notificationsContainer.children.length === 0) {
+                notificationsContainer.innerHTML = '<div class="notification-empty">Tidak ada notifikasi</div>';
+            }
+        }, 300);
+    }
+
+    /**
+     * Check sensor data dan trigger alert jika alarm aktif dan ada anomali
+     */
+    function checkSecurityAlerts(latestData) {
+        // Hanya trigger alert jika alarm aktif
+        if (!alarmActive) return;
+
+        const timestamp = latestData.recorded_at || new Date().toISOString();
+        const motion = latestData.motion;
+        const door = latestData.door;
+
+        // Check gerakan (PIR)
+        if (motion === 1 || motion === '1') {
+            const motionKey = `${timestamp}-motion`;
+            if (!notifiedAlerts.has(motionKey)) {
+                showSecurityAlert(
+                    `🚨 GERAKAN TERDETEKSI pada ${new Date(timestamp).toLocaleTimeString('id-ID')}`,
+                    'error'
+                );
+                notifiedAlerts.add(motionKey);
+            }
+        }
+
+        // Check pintu (Magnetic Sensor)
+        if (door === 1 || door === '1') {
+            const doorKey = `${timestamp}-door`;
+            if (!notifiedAlerts.has(doorKey)) {
+                showSecurityAlert(
+                    `🚨 PINTU TERBUKA pada ${new Date(timestamp).toLocaleTimeString('id-ID')}`,
+                    'error'
+                );
+                notifiedAlerts.add(doorKey);
+            }
+        }
+    }
 
 function detectSensorColumn(sensorType, raw) {
   const s = ((sensorType || raw) + '').toLowerCase();
@@ -352,6 +437,11 @@ async function loadData() {
     // Sort timestamps descending (newest first)
     const rows = Object.values(map).sort((a, b) => new Date(b.recorded_at) - new Date(a.recorded_at));
 
+    // Check latest data untuk alert jika ada gerakan/pintu terbuka dan alarm aktif
+    if (rows.length > 0) {
+      checkSecurityAlerts(rows[0]);
+    }
+
     tableBody.innerHTML = rows.map(r => {
       const motionCell = (r.motion == 1 || r.motion === '1' ? '1' : '0');
       const doorCell = (r.door === null || r.door === undefined) ? '-' : ((r.door == 1 || r.door === '1') ? 'Terbuka' : 'Tertutup');
@@ -367,8 +457,11 @@ async function loadData() {
     console.error('Gagal memuat data:', error);
   }
 }
+
+    setInterval(loadData, 3000);
     // Load data pertama kali
     loadData();
+
 
         // Auto refresh every 5 seconds
         setInterval(loadStatus, 5000);

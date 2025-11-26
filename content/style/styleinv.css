@@ -112,6 +112,13 @@ body{
     padding-left: 15%;
 }
 
+.table-wrapper {
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
 .titlestakat{
     font-size: 36px;
     font-weight: bold;
@@ -147,6 +154,13 @@ body{
     gap: 40px;
     align-items: center;
 }
+
+.status-box{
+    border-radius: 5px;
+    background-color: #58fcd0;
+    gap: 20px;
+}
+
 
 .left-bottom-left{
     display: grid;

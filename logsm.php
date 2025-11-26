@@ -7,6 +7,7 @@
     <title>Document</title>
         <link rel="stylesheet" href="content/style/stylelogsm.css">
         <link rel="stylesheet" href="content/style/header.css">
+        <link rel="stylesheet" href="content/style/notifications.css">
 </head>
 <body>
     <header class="header">
@@ -35,7 +36,9 @@
         <div class="container">
         <div class="section">
             <h2>Notification</h2>
-            <div id="notifications"></div>
+            <div id="notifications" class="notification-container">
+                <div class="notification-empty">Tidak ada notifikasi</div>
+            </div>
         </div>
 
         <div class="section">
@@ -63,7 +66,17 @@
 </body>
 
 <script>
-        document.addEventListener('DOMContentLoaded', function() {
+    // Configuration for sensor thresholds
+    const THRESHOLDS = {
+        temperature: { min: 18, max: 28 },
+        humidity: { min: 30, max: 80 }
+    };
+    const NOTIFICATION_DURATION = 5000; // ms, 0 = unlimited
+
+    // Track notified data to avoid duplicate notifications
+    const notifiedData = new Set();
+
+    document.addEventListener('DOMContentLoaded', function() {
         const logo = document.querySelector('.logo-clickable');
         const dropdown = document.querySelector('.dropdown-menu');
         
@@ -82,16 +95,115 @@
 
     const deviceId = "esp32-unit-001";
     const tableBody = document.getElementById("sensor-table-body");
+    const notificationsContainer = document.getElementById("notifications");
+
+    /**
+     * Menampilkan notifikasi
+     * @param {string} message - Pesan notifikasi
+     * @param {string} type - Tipe notifikasi: 'success', 'warning', 'error', 'info'
+     * @param {number} duration - Durasi tampil (ms), 0 = unlimited
+     */
+    function showNotification(message, type = 'info', duration = NOTIFICATION_DURATION) {
+        // Hapus pesan "Tidak ada notifikasi" jika ada
+        const emptyMsg = notificationsContainer.querySelector('.notification-empty');
+        if (emptyMsg) {
+            emptyMsg.remove();
+        }
+
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <span>${message}</span>
+            <button class="notification-close">×</button>
+        `;
+
+        // Close button handler
+        notification.querySelector('.notification-close').addEventListener('click', function() {
+            removeNotification(notification);
+        });
+
+        notificationsContainer.appendChild(notification);
+
+        // Auto remove after duration
+        if (duration > 0) {
+            setTimeout(() => {
+                removeNotification(notification);
+            }, duration);
+        }
+    }
+
+    /**
+     * Menghapus notifikasi dengan animasi
+     */
+    function removeNotification(notificationEl) {
+        notificationEl.classList.add('removing');
+        setTimeout(() => {
+            notificationEl.remove();
+            // Show empty message jika tidak ada notifikasi lagi
+            if (notificationsContainer.children.length === 0) {
+                notificationsContainer.innerHTML = '<div class="notification-empty">Tidak ada notifikasi</div>';
+            }
+        }, 300);
+    }
+
+    /**
+     * Check sensor data terhadap threshold dan generate notifikasi
+     */
+    function checkThresholds(data) {
+        const uniqueKey = `${data.recorded_at}-${data.value}-${data.raw_value}`;
+
+        // Skip jika sudah di-notify untuk data yang sama
+        if (notifiedData.has(uniqueKey)) {
+            return;
+        }
+
+        const temperature = parseFloat(data.value);
+        const humidity = parseFloat(data.raw_value);
+
+        // Check temperature
+        if (temperature < THRESHOLDS.temperature.min) {
+            showNotification(
+                `⚠️ Suhu Rendah: ${temperature}°C (minimum: ${THRESHOLDS.temperature.min}°C)`,
+                'warning'
+            );
+            notifiedData.add(uniqueKey);
+        } else if (temperature > THRESHOLDS.temperature.max) {
+            showNotification(
+                `⚠️ Suhu Tinggi: ${temperature}°C (maksimum: ${THRESHOLDS.temperature.max}°C)`,
+                'warning'
+            );
+            notifiedData.add(uniqueKey);
+        }
+
+        // Check humidity
+        if (humidity < THRESHOLDS.humidity.min) {
+            showNotification(
+                `⚠️ Kelembapan Rendah: ${humidity}% (minimum: ${THRESHOLDS.humidity.min}%)`,
+                'warning'
+            );
+            notifiedData.add(uniqueKey);
+        } else if (humidity > THRESHOLDS.humidity.max) {
+            showNotification(
+                `⚠️ Kelembapan Tinggi: ${humidity}% (maksimum: ${THRESHOLDS.humidity.max}%)`,
+                'warning'
+            );
+            notifiedData.add(uniqueKey);
+        }
+    }
 
     async function loadData() {
       try {
-        const response = await fetch(`http://localhost/project_iot/api_pdo/get_sensor_data_airsys.php?device_id=${deviceId}`); // PHP
-        // const response = await fetch(`http://localhost:3000/api_pdo/get_sensor_data_airsys?device_id=${deviceId}`); // JS
+        const response = await fetch(`http://localhost/project_iot/api_pdo/get_sensor_data_airsys.php?device_id=${deviceId}`);
         const datas = await response.json();
 
         if (!datas || datas.length === 0) {
           tableBody.innerHTML = `<tr><td colspan="4" class="text-center">Tidak Ada Data</td></tr>`;
           return;
+        }
+
+        // Check latest data untuk notifikasi (ambil yang paling baru)
+        if (datas.length > 0) {
+            checkThresholds(datas[0]);
         }
 
         tableBody.innerHTML = datas.map((data, index) => `

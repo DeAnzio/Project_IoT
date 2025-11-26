@@ -5,7 +5,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Monitoring Supply Makanan</title>
+    <title>Monitoring Ruang Inventaris</title>
       <link rel="stylesheet" href="content/style/header.css">
     <link rel="stylesheet" href="content/style/stylesm.css">
     <link rel="stylesheet" href="content/style/header.css">
@@ -18,7 +18,7 @@
         <img src="content/stripheader.png" alt="Logo" class="logo-clickable">
         <div class="dropdown-menu">
             <a href="dashboard.php">Dashboard</a>
-            <a href="gudangInv.php">Ruang Inventaris</a>
+            <a href="gudangInv.php">Gudang</a>
             <a href="logsm.php">Data Log</a>
         </div>
     </div>
@@ -40,7 +40,7 @@
     <!-- Info Gudang -->
     <div class="card-left">
         <div class="card-left-top">
-            <h2 class="titlesuhulembab">Gudang Supply Makanan</h2>
+            <h2 class="titlesuhulembab">Ruang Inventaris</h2>
                 <div class="device-row">
                     <div class="device-icon">
                         <img src="content/LogoGudangMakanan.png" alt="Logo">
@@ -48,15 +48,9 @@
                     <div class="devicedesc">
                         <div class="deviceline">
 
-                            <p >2 Device</p>
+                            <p >AirSys</p>
                         </div>
                         <div class="statusline">
-                            <div class="statusleft">
-                                <span class="status-text"> Status : <span id="statusText" class="status-active">Active</span> </span>
-                            </div>
-                            <div class="statusright">
-                                <button id="toggleBtn" class="toggle-switch" onclick="toggleStatus()"></button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -123,7 +117,7 @@
                 <div class="status-text off" id="status">OFF</div>
             </div>
                 <div class="menu-right">
-                    <div class="menu-item">
+                    <div class="menu-item" id="autoBtn" title="Auto Mode" style="cursor: pointer;">
                         <img src="content/autobutton.png" alt="auto">
                     </div>
                     <div class="menu-item">
@@ -322,44 +316,271 @@ let currentMode = 'auto';
 
 const deviceId = "esp32-unit-001";
 
+// Auto Mode State
+let autoModeEnabled = false;
+let autoModeCheckInterval = null;
+const AUTO_CHECK_INTERVAL = 30000; // 30 detik
+
+// Toggle Auto Mode
+function toggleAutoMode() {
+    autoModeEnabled = !autoModeEnabled;
+    const autoBtn = document.getElementById('autoBtn');
+    
+    if (autoModeEnabled) {
+        autoBtn.style.opacity = '1';
+        autoBtn.style.filter = 'brightness(1.2)';
+        console.log('Auto Mode: ON');
+        
+        // Mulai check otomatis
+        startAutoModeCheck();
+    } else {
+        autoBtn.style.opacity = '0.6';
+        autoBtn.style.filter = 'brightness(1)';
+        console.log('Auto Mode: OFF');
+        
+        // Stop check otomatis
+        stopAutoModeCheck();
+    }
+}
+
+// Fungsi untuk check sensor dan nyalakan/matikan secara otomatis
+function checkAndControlAuto() {
+    fetch(`logic/auto.logic.php?action=check&device_id=${deviceId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'ok' && data.recommendation) {
+                console.log('Auto Mode Check:', data);
+                
+                // Bandingkan dengan status UI saat ini
+                if (data.recommendation === 'on' && !isOn) {
+                    console.log('Auto turning ON (reason: ' + data.reason + ')');
+                    togglePowerButton(true);
+                } else if (data.recommendation === 'off' && isOn) {
+                    console.log('Auto turning OFF');
+                    togglePowerButton(false);
+                }
+            }
+        })
+        .catch(error => console.error('Auto check error:', error));
+}
+
+// Helper untuk toggle power button
+function togglePowerButton(turnOn) {
+    if (turnOn === isOn) return; // Sudah dalam state yang diinginkan
+    
+    isOn = turnOn;
+    const param = turnOn ? 'lampu_on' : 'lampu_off';
+    
+    // Update UI
+    const ring = document.getElementById('ring');
+    const status = document.getElementById('status');
+    
+    if (turnOn) {
+        ring.classList.remove('off');
+        ring.classList.add('on');
+        status.classList.remove('off');
+        status.classList.add('on');
+        status.textContent = 'ON';
+    } else {
+        ring.classList.remove('on');
+        ring.classList.add('off');
+        status.classList.remove('on');
+        status.classList.add('off');
+        status.textContent = 'OFF';
+    }
+    
+    // Kirim ke server
+    fetch(`logic/lampu.logic.php?${param}=true`)
+        .then(response => {
+            if (!response.ok) {
+                console.error('Request gagal');
+                isOn = !isOn; // Revert
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            isOn = !isOn; // Revert
+        });
+}
+
+// Start/Stop auto check
+function startAutoModeCheck() {
+    autoModeCheckInterval = setInterval(checkAndControlAuto, AUTO_CHECK_INTERVAL);
+    // Check immediately
+    checkAndControlAuto();
+}
+
+function stopAutoModeCheck() {
+    if (autoModeCheckInterval) {
+        clearInterval(autoModeCheckInterval);
+        autoModeCheckInterval = null;
+    }
+}
+
+// Add event listener untuk auto button
+document.addEventListener('DOMContentLoaded', function() {
+    const autoBtn = document.getElementById('autoBtn');
+    if (autoBtn) {
+        autoBtn.style.opacity = '0.6';
+        autoBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleAutoMode();
+        });
+    }
+});
+
+function parseNumber(v) {
+    if (v === null || v === undefined) return null;
+    if (typeof v === 'number') return v;
+    // try direct parse
+    const asNum = Number(v);
+    if (!Number.isNaN(asNum)) return asNum;
+    // extract first number from strings like 'h=65.00' or 't:25.8'
+    const s = String(v);
+    const m = s.match(/-?\d+(?:\.\d+)?/);
+    if (m) return parseFloat(m[0]);
+    return null;
+}
+
+function pickLatest(items) {
+    if (!Array.isArray(items) || items.length === 0) return null;
+    let best = items[0];
+    let bestTs = new Date(best.recorded_at || best.created_at || 0).getTime();
+    for (let i = 1; i < items.length; i++) {
+        const it = items[i];
+        const ts = new Date(it.recorded_at || it.created_at || 0).getTime();
+        if (ts > bestTs) {
+            best = it;
+            bestTs = ts;
+        }
+    }
+    return best;
+}
+
+function extractFromRecord(rec) {
+    // normalize record -> try sensor_type, value, and embedded JSON `data`
+    const obj = {};
+    const st = (rec.sensor_type || '').toString().toLowerCase();
+    const val = rec.value ?? rec.v ?? rec.temp ?? rec.t ?? rec.h ?? null;
+
+    // try parse data field if exists
+    if (rec.data) {
+        try {
+            const parsed = (typeof rec.data === 'string') ? JSON.parse(rec.data) : rec.data;
+            if (parsed) {
+                if (parsed.temperature !== undefined) obj.temperature = parsed.temperature;
+                if (parsed.temp !== undefined) obj.temperature = obj.temperature ?? parsed.temp;
+                if (parsed.humidity !== undefined) obj.humidity = parsed.humidity;
+                if (parsed.hum !== undefined) obj.humidity = obj.humidity ?? parsed.hum;
+                if (parsed.suhu !== undefined) obj.temperature = obj.temperature ?? parsed.suhu;
+                if (parsed.kelembapan !== undefined) obj.humidity = obj.humidity ?? parsed.kelembapan;
+            }
+        } catch (e) {
+            // ignore parse errors
+        }
+    }
+
+    // sensor_type based
+    if (st.includes('temp') || st.includes('dht') || st.includes('suhu')) {
+        obj.temperature = obj.temperature ?? val;
+    }
+    if (st.includes('hum') || st.includes('kelembap') || st.includes('humid')) {
+        obj.humidity = obj.humidity ?? val;
+    }
+
+    // fallback: if value looks like temperature/humidity numeric, try assign
+    if (obj.temperature === undefined && obj.humidity === undefined && val !== null) {
+        // ambiguous: assign to temperature if within common temp range; else humidity
+        const n = parseNumber(val);
+        if (n !== null) {
+            if (n >= -10 && n <= 60) obj.temperature = n;
+            else if (n >= 0 && n <= 100) obj.humidity = n;
+        }
+    }
+
+    return obj;
+}
+
 async function loadData() {
   try {
-    const response = await fetch(`http://localhost/project_iot/api_pdo/get_sensor_data.php?device_id=${deviceId}`);
-    const datas = await response.json();
+    const base = window.location.origin || (window.location.protocol + '//' + window.location.host);
+    const url = `${base}/project_iot/api_pdo/get_sensor_data_airsys.php?device_id=${encodeURIComponent(deviceId)}&limit=100`;
+    const response = await fetch(url, { cache: 'no-store' });
 
-    if (!datas || datas.length === 0) {
-      console.log('Tidak ada data');
+    if (!response.ok) {
+      console.error('fetch error status', response.status, response.statusText);
       return;
     }
 
-    // Ambil data terbaru
-    const latestData = datas[0];
-    
-    // Update kelembapan
-    const kelembapan = latestData.humidity || latestData.kelembapan || 0;
-    const statusKelembapan = kelembapan < 30 ? 'Kering' : kelembapan > 70 ? 'Lembap' : 'Normal';
-    const colorKelembapan = kelembapan < 30 ? 'bg-danger' : kelembapan > 70 ? 'bg-warning' : 'bg-success';
-    
-    document.getElementById('kelembapan-box').className = `status-box ${colorKelembapan}`;
-    document.getElementById('kelembapan-value').textContent = `Kelembapan : ${kelembapan} %`;
-    document.getElementById('kelembapan-status').textContent = `Status : ${statusKelembapan}`;
+    const json = await response.json();
+    let datas = json;
 
-    // Update suhu
-    const suhu = latestData.temperature || latestData.suhu || 0;
-    const statusSuhu = suhu < 20 ? 'Dingin' : suhu > 30 ? 'Panas' : 'Normal';
-    const colorSuhu = suhu < 20 ? 'bg-primary' : suhu > 30 ? 'bg-danger' : 'bg-success';
-    
-    document.getElementById('suhu-box').className = `status-box ${colorSuhu}`;
-    document.getElementById('suhu-value').textContent = `Suhu : ${suhu} °C`;
-    document.getElementById('suhu-status').textContent = `Status : ${statusSuhu}`;
+    if (json && typeof json === 'object' && !Array.isArray(json)) {
+      if (Array.isArray(json.data)) datas = json.data;
+      else if (Array.isArray(json.results)) datas = json.results;
+      else if (Array.isArray(json.items)) datas = json.items;
+      else datas = [json];
+    }
+
+    if (!Array.isArray(datas) || datas.length === 0) {
+      console.log('Tidak ada data sensor dari API');
+      return;
+    }
+
+    // build arrays of records with parsed temp/hum fields
+        const parsed = datas.map(d => {
+            const rec = Object.assign({}, d);
+            const ex = extractFromRecord(rec);
+            rec._temperature = ex.temperature !== undefined ? parseNumber(ex.temperature) : null;
+            // humidity can be in many places; use parsed humidity or fallback to raw_value
+            rec._humidity = ex.humidity !== undefined ? parseNumber(ex.humidity) : (rec.raw_value !== undefined ? parseNumber(rec.raw_value) : null);
+            return rec;
+        });
+
+    // pick latest record that has temperature/humidity
+    const tempCandidates = parsed.filter(r => r._temperature !== null);
+    const humCandidates = parsed.filter(r => r._humidity !== null);
+
+    const latestTempRec = pickLatest(tempCandidates);
+    const latestHumRec = pickLatest(humCandidates);
+
+    const suhu = latestTempRec ? latestTempRec._temperature : null;
+    const kelembapan = latestHumRec ? latestHumRec._humidity : null;
+
+    if (kelembapan === null || kelembapan === undefined) {
+      document.getElementById('kelembapan-value').textContent = `Kelembapan : -- %`;
+      document.getElementById('kelembapan-status').textContent = `Status : Tidak tersedia`;
+      document.getElementById('kelembapan-box').className = 'status-box bg-secondary';
+    } else {
+      const statusKelembapan = kelembapan < 30 ? 'Kering' : kelembapan > 70 ? 'Lembap' : 'Normal';
+      const colorKelembapan = kelembapan < 30 ? 'bg-danger' : kelembapan > 70 ? 'bg-warning' : 'bg-success';
+      document.getElementById('kelembapan-box').className = `status-box ${colorKelembapan}`;
+      document.getElementById('kelembapan-value').textContent = `Kelembapan : ${kelembapan} %`;
+      document.getElementById('kelembapan-status').textContent = `Status : ${statusKelembapan}`;
+    }
+
+    if (suhu === null || suhu === undefined) {
+      document.getElementById('suhu-value').textContent = `Suhu : -- °C`;
+      document.getElementById('suhu-status').textContent = `Status : Tidak tersedia`;
+      document.getElementById('suhu-box').className = 'status-box bg-secondary';
+    } else {
+      const statusSuhu = suhu < 20 ? 'Dingin' : suhu > 30 ? 'Panas' : 'Normal';
+      const colorSuhu = suhu < 20 ? 'bg-primary' : suhu > 30 ? 'bg-danger' : 'bg-success';
+      document.getElementById('suhu-box').className = `status-box ${colorSuhu}`;
+      document.getElementById('suhu-value').textContent = `Suhu : ${suhu} °C`;
+      document.getElementById('suhu-status').textContent = `Status : ${statusSuhu}`;
+    }
 
   } catch (error) {
     console.error('Gagal memuat data:', error);
   }
 }
 
-        // Auto refresh every 5 seconds
-        setInterval(loadStatus, 5000);
+        // Auto refresh every 5 seconds untuk sensor data
+            setInterval(loadData, 5000);
+
+            // Auto refresh every 5 seconds untuk status
+            setInterval(loadStatus, 5000);
 
         // Load initial status
         loadData();

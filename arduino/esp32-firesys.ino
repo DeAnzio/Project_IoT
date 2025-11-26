@@ -9,23 +9,31 @@
 DHT dht(DHTPIN, DHTTYPE);
 
 // Konfigurasi Sensor MQ-2
-#define MQ2PIN 19         // Pin Digital MQ-2
+#define MQ2PIN 34         // Pin Analog MQ-2 (Gunakan GPIO 34, 35, 36, atau 39 untuk ADC)
 
 // Konfigurasi Aktuator
 #define PUMP_PIN 5        // Pin Relay Pompa (D5)
+// Buzzer pin (optional, added for fire suppression alert)
+#define BUZZER_PIN 19     // Pin Buzzer
+
+//10.35.125.230
 
 // Konfigurasi WiFi dan Server
-const char* ssid = "YOUR_SSID";                       // Nama WiFi Kamu
-const char* password = "YOUR_WIFI_PASS";              // Password WiFI Kamu
-const char* server = "http://your-domain.or.ip/project_iot/api_pdo";  // IP Server
+const char* ssid = "Hitam_Legam";                       // Nama WiFi Kamu
+const char* password = "00000000";              // Password WiFI Kamu
+const char* server = "http://10.35.125.230/project_iot/api_pdo";  // IP Server
 const char* DEVICE_ID = "esp32-unit-002";             // ID Device
 
 // Pengaturan Waktu
 unsigned long lastSend = 0;
-const unsigned long sendInterval = 2 * 1000UL; // Kirim data tiap 15 detik
+const unsigned long sendInterval = 2 * 1000UL; // Kirim data tiap 2 detik
 
 unsigned long lastPoll = 0;
 const unsigned long pollInterval = 2 * 1000UL;  // Cek perintah tiap 2 detik
+
+// Buzzer tracking
+unsigned long buzzerStartTime = 0;
+const unsigned long buzzerDuration = 3000; // Buzzer on duration (ms)
 
 void setup(){
   // Setup Basic
@@ -33,9 +41,11 @@ void setup(){
   dht.begin();                      // Jalankan DHT Sensor
   
   // Setup Pin
-  pinMode(MQ2PIN, INPUT);           // MQ-2 sebagai INPUT
+  pinMode(MQ2PIN, INPUT);           // MQ-2 sebagai INPUT (Analog)
   pinMode(PUMP_PIN, OUTPUT);        // Relay Pompa sebagai OUTPUT
   digitalWrite(PUMP_PIN, LOW);      // Default pompa mati (relay LOW)
+  pinMode(BUZZER_PIN, OUTPUT);
+  digitalWrite(BUZZER_PIN, LOW);
 
   // Koneksi WiFi
   WiFi.begin(ssid, password);
@@ -71,6 +81,12 @@ void loop(){
     lastPoll = now;
     pollCommands();
   }
+
+  // Handle buzzer timeout
+  if (buzzerStartTime > 0 && (now - buzzerStartTime) > buzzerDuration) {
+    digitalWrite(BUZZER_PIN, LOW);
+    buzzerStartTime = 0;
+  }
 }
 
 // Fungsi untuk mengirim data sensor ke database
@@ -79,8 +95,11 @@ void sendSensorData(){
   float humidity = dht.readHumidity();
   float temperature = dht.readTemperature();
   
-  // Baca data MQ-2 (Digital)
-  int mq2Status = digitalRead(MQ2PIN);  // 0 = Gas terdeteksi, 1 = Aman
+  // Baca data MQ-2 (Analog) - ESP32 ADC: 0-4095 (12-bit)
+  int mq2Value = analogRead(MQ2PIN);
+  
+  // Konversi ke voltage (ESP32: 0-3.3V)
+  float voltage = (mq2Value / 4095.0) * 3.3;
   
   // Validasi data DHT11
   if (isnan(humidity) || isnan(temperature)) {
@@ -88,11 +107,7 @@ void sendSensorData(){
     return;
   }
   
-  // Tampilkan data di Serial Monitor (debug)
-  Serial.println("=== Sensor Data ===");
-  Serial.printf("Temperature: %.2f°C\n", temperature);
-  Serial.printf("Humidity: %.2f%%\n", humidity);
-  Serial.printf("MQ-2 Status: %s\n", mq2Status == 0 ? "Gas Detected!" : "Safe");
+  Serial.printf("MQ-2 Analog: %d (%.2fV)\n", mq2Value, voltage);
   
   // Kirim data ke server jika WiFi terhubung
   if (WiFi.status() == WL_CONNECTED) {
@@ -141,15 +156,15 @@ void sendSensorData(){
     }
     http.end();
     
-    // === Kirim Data MQ-2 ===
+    // === Kirim Data MQ-2 (Analog) ===
     http.begin(url);
     http.addHeader("Content-Type", "application/json");
     
     StaticJsonDocument<256> docMQ2;
     docMQ2["device_id"] = DEVICE_ID;
     docMQ2["sensor_type"] = "MQ2_gas";
-    docMQ2["value"] = mq2Status;  // 0 atau 1
-    docMQ2["raw"] = mq2Status == 0 ? "gas_detected" : "safe";
+    docMQ2["value"] = mq2Value;  // Nilai analog 0-4095
+    docMQ2["raw"] = String("voltage=") + String(voltage, 2);
     
     String bodyMQ2;
     serializeJson(docMQ2, bodyMQ2);
@@ -220,6 +235,19 @@ void executeCommand(long id, String cmd, String payload){
     digitalWrite(PUMP_PIN, LOW);   // Matikan pompa
     result = "pompa_off_ok";
     Serial.println("Pompa OFF");
+  } 
+  // Buzzer controls for alerting
+  else if (cmd == "buzzer_on") {
+    digitalWrite(BUZZER_PIN, HIGH);
+    buzzerStartTime = millis();
+    result = "buzzer_on_ok";
+    Serial.println("Buzzer ON");
+  }
+  else if (cmd == "buzzer_off") {
+    digitalWrite(BUZZER_PIN, LOW);
+    buzzerStartTime = 0;
+    result = "buzzer_off_ok";
+    Serial.println("Buzzer OFF");
   } 
   else {
     result = "cmd_not_supported";
