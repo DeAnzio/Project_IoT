@@ -4,7 +4,7 @@
 #include <ArduinoJson.h>  // Library ArduinoJson
 
 // Konfigurasi Sensor DHT11
-#define DHTPIN 21         // Pin DHT11 - Data Sensor
+#define DHTPIN 23         // Pin DHT11 - Data Sensor
 #define DHTTYPE DHT11     // Tipe Sensor DHT11
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -21,7 +21,7 @@ DHT dht(DHTPIN, DHTTYPE);
 // Konfigurasi WiFi dan Server
 const char* ssid = "Hitam_Legam";                       // Nama WiFi Kamu
 const char* password = "00000000";              // Password WiFI Kamu
-const char* server = "http://10.35.125.230/project_iot/api_pdo";  // IP Server
+const char* server = "http://10.252.112.230/project_iot/api_pdo";  // IP Server
 const char* DEVICE_ID = "esp32-unit-002";             // ID Device
 
 // Pengaturan Waktu
@@ -91,21 +91,13 @@ void loop(){
 
 // Fungsi untuk mengirim data sensor ke database
 void sendSensorData(){
-  // Baca data DHT11
-  float humidity = dht.readHumidity();
-  float temperature = dht.readTemperature();
-  
+
   // Baca data MQ-2 (Analog) - ESP32 ADC: 0-4095 (12-bit)
   int mq2Value = analogRead(MQ2PIN);
   
   // Konversi ke voltage (ESP32: 0-3.3V)
   float voltage = (mq2Value / 4095.0) * 3.3;
   
-  // Validasi data DHT11
-  if (isnan(humidity) || isnan(temperature)) {
-    Serial.println("Failed to read from DHT11");
-    return;
-  }
   
   Serial.printf("MQ-2 Analog: %d (%.2fV)\n", mq2Value, voltage);
   
@@ -118,44 +110,7 @@ void sendSensorData(){
     http.begin(url);
     http.addHeader("Content-Type", "application/json");
     
-    StaticJsonDocument<256> docTemp;
-    docTemp["device_id"] = DEVICE_ID;
-    docTemp["sensor_type"] = "DHT11_temp";
-    docTemp["value"] = temperature;
-    docTemp["raw"] = String("h=") + String(humidity);
-    
-    String bodyTemp;
-    serializeJson(docTemp, bodyTemp);
-    int codeTemp = http.POST(bodyTemp);
-    
-    if (codeTemp > 0) {
-      Serial.printf("Temperature sent, code=%d\n", codeTemp);
-    } else {
-      Serial.printf("Temperature POST failed: %s\n", http.errorToString(codeTemp).c_str());
-    }
-    http.end();
-    
-    // === Kirim Data Humidity ===
-    http.begin(url);
-    http.addHeader("Content-Type", "application/json");
-    
-    StaticJsonDocument<256> docHum;
-    docHum["device_id"] = DEVICE_ID;
-    docHum["sensor_type"] = "DHT11_humidity";
-    docHum["value"] = humidity;
-    docHum["raw"] = String("t=") + String(temperature);
-    
-    String bodyHum;
-    serializeJson(docHum, bodyHum);
-    int codeHum = http.POST(bodyHum);
-    
-    if (codeHum > 0) {
-      Serial.printf("Humidity sent, code=%d\n", codeHum);
-    } else {
-      Serial.printf("Humidity POST failed: %s\n", http.errorToString(codeHum).c_str());
-    }
-    http.end();
-    
+
     // === Kirim Data MQ-2 (Analog) ===
     http.begin(url);
     http.addHeader("Content-Type", "application/json");
@@ -240,12 +195,14 @@ void executeCommand(long id, String cmd, String payload){
   else if (cmd == "buzzer_on") {
     digitalWrite(BUZZER_PIN, HIGH);
     buzzerStartTime = millis();
+    tone(BUZZER_PIN,1000);
     result = "buzzer_on_ok";
     Serial.println("Buzzer ON");
   }
   else if (cmd == "buzzer_off") {
     digitalWrite(BUZZER_PIN, LOW);
     buzzerStartTime = 0;
+    noTone(BUZZER_PIN);
     result = "buzzer_off_ok";
     Serial.println("Buzzer OFF");
   } 

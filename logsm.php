@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Log Inventaris</title>
         <link rel="stylesheet" href="content/style/stylelogsm.css">
         <link rel="stylesheet" href="content/style/header.css">
         <link rel="stylesheet" href="content/style/notifications.css">

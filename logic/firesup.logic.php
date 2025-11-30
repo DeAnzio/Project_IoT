@@ -1,7 +1,5 @@
 <?php
-require_once __DIR__ . '/../config/koneksi_pdo.php';
-require_once __DIR__ . '/../config/auth.php';
-// Load firesup configuration
+// Load firesup configuration first
 $firesupConfig = file_exists(__DIR__ . '/../config/firesup.php') ? require __DIR__ . '/../config/firesup.php' : [];
 
 // Expose the logic as a function so it can be called internally without sending HTTP headers
@@ -16,8 +14,22 @@ function firesup_handle($mq2, $device_id = null, $threshold = null) {
         throw new InvalidArgumentException('mq2_gas value required');
     }
 
-    if (!isset($koneksi)) $koneksi = null;
-    $pdo = $koneksi ?? null;
+    // Get PDO connection - try global first, then create new connection
+    if (!isset($koneksi) || !$koneksi) {
+        try {
+            // Create direct connection if global not available
+            $koneksi = new PDO(
+                "mysql:host=localhost;dbname=iot_app;charset=utf8mb4",
+                'root',
+                '',
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+            );
+        } catch (Exception $e) {
+            throw new Exception('Database connection failed: ' . $e->getMessage());
+        }
+    }
+    
+    $pdo = $koneksi;
     if (!$pdo) {
         throw new Exception('Database connection failed');
     }
@@ -60,32 +72,32 @@ function firesup_handle($mq2, $device_id = null, $threshold = null) {
         // If normal/low: ensure pompa and buzzer OFF if previously ON
         $checkOn = $pdo->prepare("SELECT id, command FROM commands WHERE device_id = :device_id AND command IN ('pompa_on','buzzer_on') AND status IN ('pending','executed') ORDER BY created_at DESC LIMIT 1");
         $checkOn->execute([':device_id' => $device_id]);
-        $onExists = (bool) $checkOn->fetchColumn();
+        $lastOnCmd = $checkOn->fetch(PDO::FETCH_ASSOC);
+        $onExists = (bool) $lastOnCmd;
 
         if ($onExists) {
-            $checkRecentOffSql = "SELECT id FROM commands WHERE device_id = :device_id AND command = :command AND created_at > DATE_SUB(NOW(), INTERVAL $debounce SECOND) LIMIT 1";
-            $checkRecentOff = $pdo->prepare($checkRecentOffSql);
-
-            if (!empty($firesupConfig['enable_pump'])) {
-                $checkRecentOff->execute([':device_id' => $device_id, ':command' => 'pompa_off']);
-                $pumpOffRecent = (bool) $checkRecentOff->fetchColumn();
-                if (!$pumpOffRecent) {
+            // Check if there's already a PENDING OFF command (don't spam OFF)
+            // But allow OFF if the last command was ON and no OFF is pending
+            $checkPendingOff = $pdo->prepare("SELECT id FROM commands WHERE device_id = :device_id AND command IN ('pompa_off','buzzer_off') AND status = 'pending' ORDER BY created_at DESC LIMIT 1");
+            $checkPendingOff->execute([':device_id' => $device_id]);
+            $pendingOffExists = (bool) $checkPendingOff->fetchColumn();
+            
+            // Send OFF commands if no pending OFF exists
+            if (!$pendingOffExists) {
+                if (!empty($firesupConfig['enable_pump'])) {
                     $ins = $pdo->prepare("INSERT INTO commands (device_id, command, payload, status, created_at) VALUES (:device_id, 'pompa_off', :payload, 'pending', NOW(6))");
                     $ins->execute([':device_id' => $device_id, ':payload' => json_encode(['source'=>'firesup.logic','ts'=>date('c')])]);
                     $actions[] = 'pompa_off';
                 }
-            }
 
-            if (!empty($firesupConfig['enable_buzzer'])) {
-                $checkRecentOff->execute([':device_id' => $device_id, ':command' => 'buzzer_off']);
-                $buzzerOffRecent = (bool) $checkRecentOff->fetchColumn();
-                if (!$buzzerOffRecent) {
+                if (!empty($firesupConfig['enable_buzzer'])) {
                     $ins = $pdo->prepare("INSERT INTO commands (device_id, command, payload, status, created_at) VALUES (:device_id, 'buzzer_off', :payload, 'pending', NOW(6))");
                     $ins->execute([':device_id' => $device_id, ':payload' => json_encode(['source'=>'firesup.logic','ts'=>date('c')])]);
                     $actions[] = 'buzzer_off';
                 }
             }
 
+            // Cancel any pending ON commands to prevent them from being executed
             $cancelOn = $pdo->prepare("UPDATE commands SET status = 'cancelled' WHERE device_id = :device_id AND command IN ('pompa_on','buzzer_on') AND status = 'pending'");
             $cancelOn->execute([':device_id' => $device_id]);
         }

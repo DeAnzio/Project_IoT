@@ -14,7 +14,7 @@ DHT dht(DHTPIN, DHTTYPE);
 // konfigurasi WiFi dan server
 const char* ssid = "Hitam_Legam";                       // Nama WiFi Kamu
 const char* password = "00000000";              // Password WiFI Kamu
-const char* server = "http://your-domain.or.ip/project_app/api_pdo";  // IP PC kamu - PHP (updated to api_pdo shim)
+const char* server = "http://10.35.125.230/project_app/api_pdo";  // IP PC kamu - PHP (updated to api_pdo shim)
 // const char* server = "http://your-domain.or.ip:3000/api";  // IP PC kamu - Express
 const char* DEVICE_ID = "esp32-unit-001";             // (opsional) untuk ngasih tau Device aja
 

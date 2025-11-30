@@ -56,18 +56,17 @@ if ($stmt->rowCount() === 0) {
     exit;
 }
 
-// Kembalikan status OK
-echo json_encode(['status' => 'ok']);
-
-// Jika data MQ2 dikirim, jalankan logika fire suppression secara internal
+// Jika data MQ2 dikirim, jalankan logika fire suppression sebelum response
 if (strtoupper($sensor_type) === 'MQ2_GAS' || strtoupper($sensor_type) === 'MQ2') {
     try {
         require_once __DIR__ . '/../logic/firesup.logic.php';
-        // Call handler, but ignore result for API response; we log it
         $res = firesup_handle(floatval($value), $device_id);
         error_log('firesup triggered: ' . json_encode($res));
     } catch (Exception $e) {
         error_log('firesup.handle error: ' . $e->getMessage());
     }
 }
+
+// Kembalikan status OK
+echo json_encode(['status' => 'ok']);
 
