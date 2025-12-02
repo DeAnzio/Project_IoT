@@ -10,7 +10,7 @@
 // Konfigurasi WiFi dan server
 const char* ssid = "Hitam_Legam";
 const char* password = "00000000";
-const char* server = "http://10.35.125.230/project_iot/api_pdo";
+const char* server = "http://10.252.112.230/project_iot/api_pdo";
 const char* DEVICE_ID = "esp32-unit-003";
 
 // Untuk ngatur waktu
@@ -184,12 +184,14 @@ void executeCommand(long id, String cmd, String payload){
     digitalWrite(BUZZER, HIGH);
     buzzerStartTime = millis();
     result = "buzzer_on_ok";
+    tone(BUZZER,2000, 3000);
     Serial.println("Buzzer ON (dari server)");
   }
   else if (cmd == "buzzer_off") {
     digitalWrite(BUZZER, LOW);
     buzzerStartTime = 0;
     result = "buzzer_off_ok";
+    noTone(BUZZER);
     Serial.println("Buzzer OFF (dari server)");
   }
   else if (cmd == "lampu_on") {
